@@ -139,7 +139,7 @@ def generate_plan(gaps: GapList, hours_per_week: float, weeks_available: int) ->
     Allocate the objectives across the {weeks_available} weeks.
     For each week (week_number 1 to {weeks_available}), provide a 'goal_sentence' and a list of 'items'.
     CRITICAL REQUIREMENTS:
-    1. LIMIT to exactly 2 or 3 items total per week to be concise.
+    1. LIMIT to exactly 2 items total per week to be concise. DO NOT generate week 2, week 3, or anything beyond week 1. Stop immediately after week 1.
     2. Every week MUST include at least one practice task or project (set item_type strictly to "practice" or "project").
     2. For URLs, NEVER invent links. Only provide safe search links. Example: https://www.youtube.com/results?search_query=Topic
     Assign a UUID for each item's id field.
