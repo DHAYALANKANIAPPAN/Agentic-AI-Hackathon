@@ -8,7 +8,7 @@ Serves:
 """
 
 from contextlib import asynccontextmanager
-from typing import Optional
+from typing import Optional, List
 from fastapi import FastAPI, Form, File, UploadFile, HTTPException, Request, status
 import tempfile
 import os
@@ -179,9 +179,21 @@ async def onboard_form():
                         <label for="target_role" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
                             Target Career Role <span class="text-purple-400">*</span>
                         </label>
-                        <input type="text" id="target_role" name="target_role" required
-                            placeholder="e.g., Data Scientist, AI Engineer, or Software Engineer"
+                        <input list="role-options" id="target_role" name="target_role" required
+                            placeholder="Select from list or type your own (e.g., Data Scientist)"
                             class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <datalist id="role-options">
+                            <option value="Data Scientist">
+                            <option value="Machine Learning Engineer">
+                            <option value="Frontend Developer">
+                            <option value="Backend Engineer">
+                            <option value="Full Stack Developer">
+                            <option value="DevOps Engineer">
+                            <option value="Product Manager">
+                            <option value="UX/UI Designer">
+                            <option value="Cybersecurity Analyst">
+                            <option value="Cloud Architect">
+                        </datalist>
                     </div>
 
                     <!-- Resume / Profile Text -->
@@ -199,9 +211,9 @@ async def onboard_form():
                     <div class="text-center text-sm font-bold text-slate-500 my-2">OR</div>
                     <div>
                         <label for="resume_file" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-                            Upload Resume (PDF, DOCX, TXT)
+                            Upload Resume, Certificates & Portfolio (PDF, DOCX, TXT)
                         </label>
-                        <input type="file" id="resume_file" name="resume_file" accept=".pdf,.docx,.txt"
+                        <input type="file" id="resume_files" name="resume_files" accept=".pdf,.docx,.txt" multiple
                             class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-300 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-500/20 file:text-purple-300 hover:file:bg-purple-500/30">
                     </div>
 
@@ -251,25 +263,27 @@ async def onboard_form():
 async def handle_onboard_form(
     target_role: str = Form(...),
     resume_text: str = Form(""),
-    resume_file: UploadFile = File(None)
+    resume_files: List[UploadFile] = File([])
 ):
     """Process onboarding form submission and redirect to gap diagnostics."""
-    final_text = resume_text
-    
-    if resume_file and resume_file.filename:
-        # Save file to temp location
-        fd, temp_path = tempfile.mkstemp(suffix=os.path.splitext(resume_file.filename)[1])
-        with open(temp_path, "wb") as f:
-            f.write(await resume_file.read())
-        os.close(fd)
-        
-        # Extract text using our existing doc_reader
-        extracted = extract_text_from_file(temp_path)
-        if extracted:
-            final_text = extracted
-        
-        # Cleanup
-        os.remove(temp_path)
+    extracted_texts = []
+    if resume_text.strip():
+        extracted_texts.append(resume_text.strip())
+
+    for rf in resume_files:
+        if rf and rf.filename:
+            fd, temp_path = tempfile.mkstemp(suffix=os.path.splitext(rf.filename)[1])
+            with open(temp_path, "wb") as f:
+                f.write(await rf.read())
+            os.close(fd)
+            
+            ext_text = extract_text_from_file(temp_path)
+            if ext_text:
+                extracted_texts.append(f"--- Document: {rf.filename} ---\n" + ext_text)
+                
+            os.remove(temp_path)
+            
+    final_text = "\n\n".join(extracted_texts)
         
     if not final_text.strip():
         # Re-render with error (simplified for demo, we'll just redirect to onboard)
