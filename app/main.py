@@ -523,8 +523,18 @@ async def view_gaps(learner_id: str):
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
                         <span>AI Tutor</span>
                     </a>
-                    <a href="/profile" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-purple-900/40 hover:bg-purple-900/60 text-purple-300 border border-purple-800/50 transition-all">+ Add Roles</a>
-<a href="/logout" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-rose-900/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/50 transition-all">Logout</a>
+                    <div class="relative group inline-block">
+                        <button class="w-8 h-8 rounded-full overflow-hidden border border-slate-700 hover:border-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all">
+                            <img src="https://ui-avatars.com/api/?name=User&background=4f46e5&color=fff" alt="Avatar" class="w-full h-full object-cover">
+                        </button>
+                        <div class="absolute right-0 top-full w-48 bg-slate-900 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all flex flex-col z-50 overflow-hidden pt-1">
+                            <div class="px-4 py-3 border-b border-slate-800">
+                                <p class="text-xs text-slate-400 font-mono truncate">Logged in</p>
+                            </div>
+                            <a href="/profile" class="px-4 py-2 text-sm text-slate-300 hover:bg-purple-900/40 hover:text-purple-300 transition-colors">Your Uploads</a>
+                            <a href="/logout" class="px-4 py-2 text-sm text-rose-400 hover:bg-rose-900/40 transition-colors border-t border-slate-800">Sign out</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </header>
@@ -783,7 +793,7 @@ async def view_weekly_plan(learner_id: str, week: int = 1, replanned: Optional[i
             """
         else:
             status_block = f"""
-            <form action="/plan/{learner_id}/complete" method="POST" enctype="multipart/form-data" class="bg-slate-950/70 p-4 rounded-xl border border-slate-800/80 space-y-3 mt-3">
+            <form action="/plan/{learner_id}/complete" method="POST" class="bg-slate-950/70 p-4 rounded-xl border border-slate-800/80 space-y-3 mt-3">
                 <input type="hidden" name="item_id" value="{item.id}">
                 <input type="hidden" name="week" value="{week}">
                 <div class="flex flex-wrap items-center gap-4 text-xs">
@@ -791,10 +801,6 @@ async def view_weekly_plan(learner_id: str, week: int = 1, replanned: Optional[i
                         <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Minutes Spent</label>
                         <input type="number" name="minutes_spent" value="45" min="5" max="600" required
                                class="w-24 px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white text-xs">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Upload Evidence (Optional)</label>
-                        <input type="file" name="evidence_file" class="w-48 text-[10px] text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:font-semibold file:bg-purple-900/40 file:text-purple-300 hover:file:bg-purple-900/60 transition-all">
                     </div>
                     <div>
                         <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Self Rating</label>
@@ -899,8 +905,18 @@ async def view_weekly_plan(learner_id: str, week: int = 1, replanned: Optional[i
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
                         <span>AI Tutor Chat</span>
                     </a>
-                    <a href="/profile" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-purple-900/40 hover:bg-purple-900/60 text-purple-300 border border-purple-800/50 transition-all">+ Add Roles</a>
-<a href="/logout" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-rose-900/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/50 transition-all">Logout</a>
+                    <div class="relative group inline-block">
+                        <button class="w-8 h-8 rounded-full overflow-hidden border border-slate-700 hover:border-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all">
+                            <img src="https://ui-avatars.com/api/?name=User&background=4f46e5&color=fff" alt="Avatar" class="w-full h-full object-cover">
+                        </button>
+                        <div class="absolute right-0 top-full w-48 bg-slate-900 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all flex flex-col z-50 overflow-hidden pt-1">
+                            <div class="px-4 py-3 border-b border-slate-800">
+                                <p class="text-xs text-slate-400 font-mono truncate">Logged in</p>
+                            </div>
+                            <a href="/profile" class="px-4 py-2 text-sm text-slate-300 hover:bg-purple-900/40 hover:text-purple-300 transition-colors">Your Uploads</a>
+                            <a href="/logout" class="px-4 py-2 text-sm text-rose-400 hover:bg-rose-900/40 transition-colors border-t border-slate-800">Sign out</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </header>
@@ -2347,7 +2363,7 @@ async def profile_page(request: Request):
         roles_html += f'''
         <a href="/dashboard/{role['learner_id']}" class="block p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-800 transition-colors">
             <h3 class="text-lg font-bold text-white">{role['target_role']}</h3>
-            <p class="text-sm text-slate-400">View progress dashboard →</p>
+            <p class="text-sm text-slate-400">Manage uploads and dashboard →</p>
         </a>
         '''
         
@@ -2379,7 +2395,7 @@ async def profile_page(request: Request):
             </div>
             
             <a href="/onboard" class="w-full block text-center py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold rounded-lg shadow-lg transition-all">
-                + Add New Role
+                + Upload New Document
             </a>
         </div>
     
