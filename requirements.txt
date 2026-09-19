@@ -1,2 +1,8 @@
 pydantic
 pytest
+fastapi
+uvicorn[standard]
+jinja2
+python-multipart
+httpx
+google-genai
