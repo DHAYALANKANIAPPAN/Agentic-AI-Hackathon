@@ -61,7 +61,7 @@ def find_gaps(profile: SkillProfile, target_role: str) -> GapList:
     2. Compare them against the user's current skills.
     3. Label each required skill as 'has', 'partial', or 'missing'.
     4. Assign a priority (1 is highest priority/foundational, higher numbers are lower priority/advanced).
-    5. For each 'partial' or 'missing' skill, generate 1 learning objective with hour estimates.
+    5. For each 'partial' or 'missing' skill, generate 2 to 3 structured learning objectives with hour estimates.
     
     Output this exactly matching the GapList schema.
     """
@@ -135,9 +135,14 @@ def generate_plan(gaps: GapList, hours_per_week: float, weeks_available: int) ->
     Here are their skill gaps and objectives:
     {gaps.model_dump_json(indent=2)}
     
+
     Allocate the objectives across the {weeks_available} weeks.
     For each week (week_number 1 to {weeks_available}), provide a 'goal_sentence' and a list of 'items'.
+    CRITICAL REQUIREMENTS:
+    1. Every week MUST include at least one PRACTICE task or PROJECT.
+    2. For URLs, NEVER invent links. Only provide search links like: 'https://www.youtube.com/results?search_query=Topic' or 'https://www.google.com/search?q=Topic'.
     Assign a UUID for each item's id field.
+
     """
     
     try:
