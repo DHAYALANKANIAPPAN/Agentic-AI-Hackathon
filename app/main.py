@@ -9,7 +9,7 @@ Serves:
 
 from contextlib import asynccontextmanager
 from typing import Optional
-from fastapi import FastAPI, Form, HTTPException, status
+from fastapi import FastAPI, Form, HTTPException, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from app.repository import init_db, get_learner
 from app.services import onboard_learner
@@ -288,9 +288,21 @@ async def view_gaps(learner_id: str):
                         EduPath <span class="text-xs uppercase font-semibold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">AI Agent</span>
                     </span>
                 </a>
-                <a href="/onboard" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all">
-                    &larr; New Intake
-                </a>
+                <div class="flex items-center gap-3">
+                    <a href="/plan/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
+                        Weekly Plan
+                    </a>
+                    <a href="/dashboard/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
+                        Dashboard
+                    </a>
+                    <a href="/chat/{learner_id}" class="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-md transition-all flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                        <span>AI Tutor</span>
+                    </a>
+                    <a href="/onboard" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-purple-900/40 hover:bg-purple-900/60 text-purple-300 border border-purple-800/50 transition-all">
+                        &larr; New Intake
+                    </a>
+                </div>
             </div>
         </header>
 
@@ -384,7 +396,7 @@ async def view_gaps(learner_id: str):
 
 
 @app.get("/plan/{learner_id}", response_class=HTMLResponse)
-async def view_weekly_plan(learner_id: str, week: int = 1):
+async def view_weekly_plan(learner_id: str, week: int = 1, replanned: Optional[int] = None):
     """Serve the weekly learning plan and study tracking interface."""
     learner = get_learner(learner_id)
     if not learner:
@@ -409,6 +421,64 @@ async def view_weekly_plan(learner_id: str, week: int = 1):
 
     current_week_items = plan.weeks.get(week, []) if plan and plan.weeks else []
     goal_sentence = plan.goal_sentences.get(week, "Build core technical proficiency") if plan and plan.goal_sentences else "Weekly technical goal"
+
+    # Adaptive replan notifications
+    replan_banner_html = ""
+    if replanned == 1 or (plan and plan.version > 1 and plan.change_reasons):
+        reasons_li = "".join(
+            f"<li class='flex items-start gap-2 text-xs text-purple-200'><span class='text-cyan-400 font-bold'>&bull;</span> <span>{r}</span></li>"
+            for r in plan.change_reasons
+        )
+        replan_banner_html = f"""
+        <div class="p-5 rounded-2xl bg-gradient-to-r from-purple-950/70 via-slate-900/90 to-cyan-950/70 border border-cyan-500/40 shadow-xl space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-300 flex items-center justify-center font-bold text-base flex-shrink-0 mt-0.5">
+                        ⚡
+                    </div>
+                    <div>
+                        <h3 class="font-heading font-bold text-sm text-white flex items-center gap-2">
+                            Adaptive Loop Triggered
+                            <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">Plan Version {plan.version}</span>
+                        </h3>
+                        <p class="text-xs text-slate-300 mt-1">
+                            Your roadmap has dynamically adapted based on recent study activity feedback. Completed items have been strictly preserved while future focus is adjusted.
+                        </p>
+                    </div>
+                </div>
+                <a href="/chat/{learner_id}" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 transition-all flex items-center gap-1.5 self-start sm:self-center whitespace-nowrap">
+                    <span>Ask AI Coach</span>
+                    &rarr;
+                </a>
+            </div>
+            {f'<div class="pt-2.5 border-t border-slate-800/80"><p class="text-[10px] uppercase font-bold text-slate-400 mb-1">Adaptive Replan Changelog:</p><ul class="space-y-1">{reasons_li}</ul></div>' if reasons_li else ''}
+        </div>
+        """
+
+    # Active struggle flags banner
+    struggle_banner_html = ""
+    if learner.struggle_flags:
+        badges = "".join(
+            f"<span class='px-2.5 py-1 rounded-lg text-xs font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30'><strong>{f.skill_name}:</strong> {f.reason}</span>"
+            for f in learner.struggle_flags
+        )
+        struggle_banner_html = f"""
+        <div class="p-4 rounded-xl bg-rose-950/30 border border-rose-800/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
+            <div class="space-y-1.5">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-rose-400 animate-pulse"></span>
+                    <h4 class="text-xs font-bold text-rose-200 uppercase tracking-wider">Active Study Friction Identified ({len(learner.struggle_flags)})</h4>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    {badges}
+                </div>
+            </div>
+            <a href="/chat/{learner_id}" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white shadow transition-all whitespace-nowrap flex items-center gap-1.5 self-start sm:self-center">
+                <span>Remediate with AI Tutor</span>
+                &rarr;
+            </a>
+        </div>
+        """
 
     # Week tabs HTML
     tabs_html = ""
@@ -563,6 +633,10 @@ async def view_weekly_plan(learner_id: str, week: int = 1):
                     <a href="/dashboard/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
                         Dashboard
                     </a>
+                    <a href="/chat/{learner_id}" class="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-md transition-all flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                        <span>AI Tutor Chat</span>
+                    </a>
                     <a href="/onboard" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-purple-900/40 hover:bg-purple-900/60 text-purple-300 border border-purple-800/50 transition-all">
                         + New Intake
                     </a>
@@ -571,6 +645,9 @@ async def view_weekly_plan(learner_id: str, week: int = 1):
         </header>
 
         <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 space-y-6">
+            {replan_banner_html}
+            {struggle_banner_html}
+
             <!-- Progress Banner -->
             <div class="glass-card rounded-2xl p-6 border border-slate-800 shadow-xl space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -645,7 +722,7 @@ async def handle_complete_item(
     week: int = Form(1),
 ):
     """Process item completion from UI form and redirect to current week."""
-    from app.services import complete_item
+    from app.services import process_progress_update
     from shared.schemas.models import Rating
 
     try:
@@ -653,19 +730,20 @@ async def handle_complete_item(
     except Exception:
         r_enum = Rating.OK
 
-    complete_item(
+    _, is_replanned = process_progress_update(
         learner_id=learner_id,
         item_id=item_id,
         minutes_spent=minutes_spent,
         self_rating=r_enum,
         quiz_score=quiz_score,
     )
-    return RedirectResponse(url=f"/plan/{learner_id}?week={week}", status_code=status.HTTP_303_SEE_OTHER)
+    redirect_query = f"?week={week}&replanned=1" if is_replanned else f"?week={week}"
+    return RedirectResponse(url=f"/plan/{learner_id}{redirect_query}", status_code=status.HTTP_303_SEE_OTHER)
 
 
 @app.get("/dashboard/{learner_id}", response_class=HTMLResponse)
 async def view_dashboard(learner_id: str):
-    """Serve basic learner dashboard with summary statistics and activity timeline."""
+    """Serve basic learner dashboard with summary statistics, struggle flags, and activity timeline."""
     learner = get_learner(learner_id)
     if not learner:
         raise HTTPException(status_code=404, detail=f"Learner ID '{learner_id}' not found.")
@@ -685,6 +763,67 @@ async def view_dashboard(learner_id: str):
             <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-slate-800 text-slate-300">{r_val}</span></td>
             <td class="py-3 px-4 text-slate-400">{act.timestamp.strftime('%b %d, %H:%M') if hasattr(act.timestamp, 'strftime') else str(act.timestamp)[:16]} {quiz_str}</td>
         </tr>
+        """
+
+    # Struggle Flags Table HTML
+    if learner.struggle_flags:
+        flag_rows = ""
+        for flag in learner.struggle_flags:
+            sev_badge = "bg-rose-500/20 text-rose-300 border-rose-500/30" if flag.severity.lower() == "high" else "bg-amber-500/20 text-amber-300 border-amber-500/30"
+            flag_rows += f"""
+            <tr class="border-b border-slate-800/80 text-xs">
+                <td class="py-3 px-4 font-bold text-white">{flag.skill_name}</td>
+                <td class="py-3 px-4 text-slate-300">{flag.reason}</td>
+                <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold border {sev_badge}">{flag.severity}</span></td>
+                <td class="py-3 px-4">
+                    <a href="/chat/{learner_id}" class="inline-flex items-center gap-1 text-xs font-semibold text-cyan-400 hover:text-cyan-300">
+                        Ask AI Tutor &rarr;
+                    </a>
+                </td>
+            </tr>
+            """
+        struggle_section_html = f"""
+        <div class="p-6 rounded-2xl bg-slate-900/80 border border-rose-900/40 space-y-4 shadow-xl">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
+                    <h3 class="font-bold text-base text-white">Active Struggle Flags ({len(learner.struggle_flags)})</h3>
+                </div>
+                <a href="/chat/{learner_id}" class="px-3 py-1 rounded-lg text-xs font-semibold bg-rose-600/30 hover:bg-rose-600/50 text-rose-200 border border-rose-500/40 transition-all flex items-center gap-1">
+                    <span>AI Remediation</span> &rarr;
+                </a>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-800 text-[11px] uppercase font-semibold text-slate-400">
+                            <th class="py-2 px-4">Skill</th>
+                            <th class="py-2 px-4">Struggle Reason</th>
+                            <th class="py-2 px-4">Severity</th>
+                            <th class="py-2 px-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {flag_rows}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        """
+    else:
+        struggle_section_html = f"""
+        <div class="p-5 rounded-2xl bg-emerald-950/20 border border-emerald-800/40 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">✓</div>
+                <div>
+                    <h4 class="text-xs font-bold text-emerald-200 uppercase tracking-wider">No Active Friction</h4>
+                    <p class="text-xs text-slate-400">Learning pace is steady with no struggle flags active.</p>
+                </div>
+            </div>
+            <a href="/chat/{learner_id}" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
+                Ask AI Tutor
+            </a>
+        </div>
         """
 
     html_content = f"""
@@ -708,6 +847,10 @@ async def view_dashboard(learner_id: str):
                 <div class="flex items-center gap-3">
                     <a href="/plan/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">Weekly Plan</a>
                     <a href="/gaps/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">Skill Gaps</a>
+                    <a href="/chat/{learner_id}" class="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-md transition-all flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                        <span>AI Tutor Chat</span>
+                    </a>
                 </div>
             </div>
         </header>
@@ -740,6 +883,9 @@ async def view_dashboard(learner_id: str):
                 </div>
             </div>
 
+            <!-- Struggle Flags Section -->
+            {struggle_section_html}
+
             <!-- Activity Log Table -->
             <div class="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-4">
                 <h3 class="font-bold text-base text-white">Recent Study Activity Logs ({len(learner.activity_log)})</h3>
@@ -764,6 +910,292 @@ async def view_dashboard(learner_id: str):
     </html>
     """
     return HTMLResponse(content=html_content)
+
+
+@app.get("/chat/{learner_id}", response_class=HTMLResponse)
+async def view_chat(learner_id: str):
+    """Serve interactive AI Coach Chat interface with learner context and message history."""
+    learner = get_learner(learner_id)
+    if not learner:
+        raise HTTPException(status_code=404, detail=f"Learner ID '{learner_id}' not found.")
+
+    from app.repository import get_chat_history
+    from app.services import compute_stats
+    chat_history = get_chat_history(learner_id)
+    stats = compute_stats(learner)
+
+    target_role = learner.gaps.target_role if learner.gaps else "Target Career"
+    plan_version = learner.plan.version if learner.plan else 1
+
+    # Render struggle alerts for sidebar
+    struggle_sidebar_html = ""
+    if learner.struggle_flags:
+        badges = ""
+        for f in learner.struggle_flags:
+            badges += f"""
+            <div class="p-2.5 rounded-xl bg-rose-950/40 border border-rose-800/50 space-y-1">
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-xs text-white">{f.skill_name}</span>
+                    <span class="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded bg-rose-900 text-rose-200">{f.severity}</span>
+                </div>
+                <p class="text-[11px] text-rose-200/80">{f.reason}</p>
+                <button type="button" onclick="insertPrompt('Can you explain how to overcome my struggle with {f.skill_name}? {f.reason}')"
+                        class="text-[11px] font-semibold text-cyan-400 hover:text-cyan-300 underline pt-1 block">
+                    Ask Coach about this &rarr;
+                </button>
+            </div>
+            """
+        struggle_sidebar_html = f"""
+        <div class="space-y-2 pt-2 border-t border-slate-800">
+            <span class="text-[10px] uppercase font-bold text-rose-400 flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span>
+                Active Learning Friction
+            </span>
+            <div class="space-y-2">
+                {badges}
+            </div>
+        </div>
+        """
+
+    # Render message history
+    messages_html = ""
+    if not chat_history:
+        messages_html = f"""
+        <div class="flex items-start gap-3 p-4 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-md">
+            <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-600 to-cyan-400 flex items-center justify-center font-extrabold text-white text-xs flex-shrink-0">
+                AI
+            </div>
+            <div class="space-y-1 text-xs text-slate-200">
+                <p class="font-bold text-white">EduPath AI Coach</p>
+                <p>
+                    Hello! I have full context of your profile, your target role of <strong class="text-cyan-300">{target_role}</strong>, and your current learning roadmap (Plan v{plan_version}).
+                </p>
+                <p class="text-slate-400">
+                    Ask me anything about your roadmap, questions on challenging concepts, or why your curriculum was adapted!
+                </p>
+            </div>
+        </div>
+        """
+    else:
+        for msg in chat_history:
+            role = msg["role"]
+            content = msg["content"]
+            if role == "user":
+                messages_html += f"""
+                <div class="flex justify-end">
+                    <div class="max-w-xl p-4 rounded-2xl rounded-tr-sm bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg space-y-1">
+                        <div class="flex items-center justify-between gap-4 text-[10px] text-purple-200 font-bold uppercase">
+                            <span>You</span>
+                        </div>
+                        <p class="text-xs whitespace-pre-wrap leading-relaxed">{content}</p>
+                    </div>
+                </div>
+                """
+            else:
+                messages_html += f"""
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-400 flex items-center justify-center font-extrabold text-white text-xs flex-shrink-0 mt-0.5 shadow-md">
+                        AI
+                    </div>
+                    <div class="max-w-xl p-4 rounded-2xl rounded-tl-sm bg-slate-900/90 border border-slate-800 text-slate-100 shadow-lg space-y-1">
+                        <div class="flex items-center justify-between gap-4 text-[10px] text-cyan-300 font-bold uppercase">
+                            <span>EduPath AI Coach</span>
+                        </div>
+                        <p class="text-xs whitespace-pre-wrap leading-relaxed">{content}</p>
+                    </div>
+                </div>
+                """
+
+    html_content = f"""
+    <!DOCTYPE html>
+    <html lang="en" class="h-full bg-slate-950 text-slate-100">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>AI Coach Chat | EduPath</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {{
+                theme: {{
+                    extend: {{
+                        fontFamily: {{
+                            sans: ['Inter', 'sans-serif'],
+                            heading: ['Outfit', 'sans-serif'],
+                        }}
+                    }}
+                }}
+            }}
+        </script>
+        <style>
+            .glass-card {{
+                background: rgba(15, 23, 42, 0.85);
+                backdrop-filter: blur(16px);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+            }}
+            .gradient-text {{
+                background: linear-gradient(135deg, #a78bfa 0%, #38bdf8 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }}
+        </style>
+    </head>
+    <body class="min-h-full flex flex-col font-sans antialiased bg-slate-950 text-slate-100">
+        <!-- Navigation -->
+        <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur sticky top-0 z-20">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+                <a href="/onboard" class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-400 flex items-center justify-center font-heading font-extrabold text-white text-lg shadow-lg">
+                        E
+                    </div>
+                    <span class="font-heading font-bold text-xl tracking-tight text-white">
+                        EduPath <span class="text-xs uppercase font-semibold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">AI Coach</span>
+                    </span>
+                </a>
+                <div class="flex items-center gap-3">
+                    <a href="/plan/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
+                        Weekly Plan
+                    </a>
+                    <a href="/dashboard/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
+                        Dashboard
+                    </a>
+                    <a href="/gaps/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
+                        Skill Gaps
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 flex flex-col md:flex-row gap-6">
+            <!-- Sidebar: Context & Quick Prompts -->
+            <aside class="w-full md:w-80 space-y-4 flex-shrink-0">
+                <div class="glass-card rounded-2xl p-5 border border-slate-800 space-y-3 shadow-xl">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <h3 class="font-heading font-bold text-sm text-white">Learner Context</h3>
+                    </div>
+                    <div class="space-y-2 text-xs">
+                        <div class="flex justify-between py-1 border-b border-slate-800/80">
+                            <span class="text-slate-400">Target Role</span>
+                            <span class="font-semibold text-white">{target_role}</span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b border-slate-800/80">
+                            <span class="text-slate-400">Plan Version</span>
+                            <span class="font-semibold text-cyan-400">v{plan_version}</span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b border-slate-800/80">
+                            <span class="text-slate-400">Pace / Hours</span>
+                            <span class="font-semibold text-purple-300">{stats.hours_spent}h logged</span>
+                        </div>
+                        <div class="flex justify-between py-1">
+                            <span class="text-slate-400">Items Completed</span>
+                            <span class="font-semibold text-emerald-400">{stats.items_done} done</span>
+                        </div>
+                    </div>
+                    {struggle_sidebar_html}
+                </div>
+
+                <!-- Suggested Quick Prompts -->
+                <div class="glass-card rounded-2xl p-5 border border-slate-800 space-y-3 shadow-xl">
+                    <h4 class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Suggested Questions</h4>
+                    <div class="space-y-2">
+                        <button type="button" onclick="insertPrompt('Why was my learning plan adapted?')"
+                                class="w-full text-left p-2.5 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 text-xs text-slate-300 hover:text-white transition-all">
+                            💡 Why was my learning plan adapted?
+                        </button>
+                        <button type="button" onclick="insertPrompt('What should I focus on this week?')"
+                                class="w-full text-left p-2.5 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 text-xs text-slate-300 hover:text-white transition-all">
+                            🎯 What should I focus on this week?
+                        </button>
+                        <button type="button" onclick="insertPrompt('Can you quiz me on core concepts?')"
+                                class="w-full text-left p-2.5 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 text-xs text-slate-300 hover:text-white transition-all">
+                            📝 Can you quiz me on core concepts?
+                        </button>
+                        <button type="button" onclick="insertPrompt('How can I better understand autograd mechanics?')"
+                                class="w-full text-left p-2.5 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 text-xs text-slate-300 hover:text-white transition-all">
+                            🧠 How can I understand autograd mechanics?
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Chat Area -->
+            <section class="flex-1 flex flex-col glass-card rounded-2xl border border-slate-800 overflow-hidden shadow-2xl min-h-[550px]">
+                <!-- Chat Header -->
+                <div class="px-6 py-4 border-b border-slate-800 bg-slate-900/60 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-400 flex items-center justify-center font-bold text-white text-sm">
+                            AI
+                        </div>
+                        <div>
+                            <h2 class="font-heading font-bold text-sm text-white">EduPath Interactive Coach</h2>
+                            <p class="text-[11px] text-slate-400">Contextual Tutor &bull; Powered by AI Provider</p>
+                        </div>
+                    </div>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        Active
+                    </span>
+                </div>
+
+                <!-- Chat Transcript Window -->
+                <div id="chat-window" class="flex-1 p-6 overflow-y-auto space-y-4 max-h-[480px]">
+                    {messages_html}
+                </div>
+
+                <!-- Chat Input Form -->
+                <div class="p-4 border-t border-slate-800 bg-slate-900/80">
+                    <form id="chat-form" action="/chat/{learner_id}" method="POST" onsubmit="handleSend()" class="flex items-center gap-3">
+                        <input type="text" id="question-input" name="question" required autocomplete="off"
+                               placeholder="Ask the AI Coach a question..."
+                               class="flex-1 px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <button type="submit" id="send-btn"
+                                class="px-5 py-3 rounded-xl font-heading font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 shadow-lg shadow-purple-600/30 transition-all flex items-center gap-2">
+                            <span id="send-text">Send</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </button>
+                    </form>
+                </div>
+            </section>
+        </main>
+
+        <script>
+            function insertPrompt(text) {{
+                const input = document.getElementById('question-input');
+                input.value = text;
+                input.focus();
+            }}
+
+            function handleSend() {{
+                const btn = document.getElementById('send-btn');
+                const text = document.getElementById('send-text');
+                btn.disabled = true;
+                btn.classList.add('opacity-80', 'cursor-not-allowed');
+                text.innerText = "Thinking...";
+            }}
+
+            window.addEventListener('DOMContentLoaded', () => {{
+                const win = document.getElementById('chat-window');
+                if (win) {{
+                    win.scrollTop = win.scrollHeight;
+                }}
+            }});
+        </script>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=html_content)
+
+
+@app.post("/chat/{learner_id}")
+async def handle_chat_message(
+    learner_id: str,
+    question: str = Form(...),
+):
+    """Process chat question and redirect back to chat UI."""
+    from app.services import chat_with_agent
+    chat_with_agent(learner_id=learner_id, question=question)
+    return RedirectResponse(url=f"/chat/{learner_id}", status_code=status.HTTP_303_SEE_OTHER)
 
 
 @app.get("/demo/seed")
@@ -795,6 +1227,45 @@ async def api_get_gaps(learner_id: str):
     return learner
 
 
+@app.get("/api/chat/{learner_id}")
+async def api_get_chat_history(learner_id: str):
+    """JSON API for retrieving chat history."""
+    from app.repository import get_chat_history
+    learner = get_learner(learner_id)
+    if not learner:
+        raise HTTPException(status_code=404, detail="Learner not found")
+    history = get_chat_history(learner_id)
+    return {"status": "success", "learner_id": learner_id, "history": history}
+
+
+@app.post("/api/chat/{learner_id}")
+async def api_send_chat_message(learner_id: str, request: Request):
+    """JSON API for sending a question and getting the AI answer."""
+    from app.services import chat_with_agent
+    content_type = request.headers.get("content-type", "")
+    question = None
+    if "application/json" in content_type:
+        try:
+            body = await request.json()
+            question = body.get("question")
+        except Exception:
+            question = None
+    else:
+        form = await request.form()
+        question = form.get("question")
+
+    if not question or not str(question).strip():
+        raise HTTPException(status_code=400, detail="Question parameter is required")
+
+    answer = chat_with_agent(learner_id=learner_id, question=str(question))
+    return {
+        "status": "success",
+        "learner_id": learner_id,
+        "question": question,
+        "answer": answer,
+    }
+
+
 @app.post("/api/learners/{learner_id}/activity")
 async def api_log_activity(
     learner_id: str,
@@ -804,7 +1275,7 @@ async def api_log_activity(
     quiz_score: Optional[float] = Form(None),
 ):
     """REST API endpoint for completing a plan item and logging activity."""
-    from app.services import complete_item
+    from app.services import process_progress_update
     from shared.schemas.models import Rating
 
     try:
@@ -812,7 +1283,7 @@ async def api_log_activity(
     except Exception:
         r_enum = Rating.OK
 
-    updated_state = complete_item(
+    updated_state, replanned = process_progress_update(
         learner_id=learner_id,
         item_id=item_id,
         minutes_spent=minutes_spent,
@@ -821,5 +1292,5 @@ async def api_log_activity(
     )
     if not updated_state:
         raise HTTPException(status_code=404, detail="Learner or item not found")
-    return {"status": "success", "learner_id": learner_id, "item_id": item_id}
+    return {"status": "success", "learner_id": learner_id, "item_id": item_id, "replanned": replanned}
 
