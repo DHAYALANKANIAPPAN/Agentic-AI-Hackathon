@@ -197,3 +197,23 @@ def save_struggle_flag(learner_id: str, flag: StruggleFlag, db_path: str = DEFAU
             datetime.utcnow().isoformat(),
         ))
         conn.commit()
+
+
+def save_plan(learner_id: str, plan: WeeklyPlan, db_path: str = DEFAULT_DB_PATH) -> None:
+    """Save or update the weekly plan for an existing learner."""
+    init_db(db_path)
+    with get_db(db_path) as conn:
+        cursor = conn.cursor()
+        plan_json = plan.model_dump_json()
+        cursor.execute("UPDATE learners SET plan_json = ? WHERE id = ?;", (plan_json, learner_id))
+        conn.commit()
+
+
+def save_gaps(learner_id: str, gaps: GapList, db_path: str = DEFAULT_DB_PATH) -> None:
+    """Save or update the gap list for an existing learner."""
+    init_db(db_path)
+    with get_db(db_path) as conn:
+        cursor = conn.cursor()
+        gaps_json = gaps.model_dump_json()
+        cursor.execute("UPDATE learners SET gaps_json = ? WHERE id = ?;", (gaps_json, learner_id))
+        conn.commit()
