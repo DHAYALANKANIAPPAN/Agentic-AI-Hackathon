@@ -30,7 +30,14 @@ def register_user(username: str, password: str, db_path: str = DEFAULT_DB_PATH) 
             cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
             conn.commit()
             return True
-        except sqlite3.IntegrityError:
+        except sqlite3.IntegrityError as e:
+            if "learner_id" in str(e):
+                try:
+                    cursor.execute("INSERT INTO users (username, password, learner_id) VALUES (?, ?, ?)", (username, password, ""))
+                    conn.commit()
+                    return True
+                except sqlite3.IntegrityError:
+                    return False
             return False # Username exists
 
 def authenticate_user(username: str, password: str, db_path: str = DEFAULT_DB_PATH) -> bool:
