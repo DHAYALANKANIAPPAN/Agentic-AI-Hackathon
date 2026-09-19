@@ -1961,3 +1961,98 @@ async def upload_certificate_replan(learner_id: str, cert_file: UploadFile = Fil
             generate_learner_plan(learner_id)
             
     return RedirectResponse(url=f"/dashboard/{learner_id}", status_code=status.HTTP_303_SEE_OTHER)
+
+from fastapi.responses import HTMLResponse, RedirectResponse
+
+@app.get("/login", response_class=HTMLResponse)
+async def login_page():
+    html_content = '''
+    <!DOCTYPE html>
+    <html lang="en" class="h-full bg-slate-950 text-slate-100">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Login | EduPath</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+        <style>
+            .glass-card { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+            .gradient-text { background: linear-gradient(135deg, #a78bfa 0%, #38bdf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        </style>
+    </head>
+    <body class="min-h-full flex items-center justify-center font-sans antialiased bg-slate-950 p-4">
+        <div class="glass-card rounded-2xl border border-slate-800 p-8 w-full max-w-md shadow-2xl relative overflow-hidden">
+            <div class="absolute -top-32 -right-32 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl"></div>
+            
+            <div class="text-center mb-8 relative z-10">
+                <div class="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center mx-auto mb-4 text-white font-bold text-xl shadow-lg shadow-indigo-500/30">E</div>
+                <h1 class="text-2xl font-bold text-white font-heading">Welcome to EduPath</h1>
+                <p class="text-slate-400 mt-2 text-sm">Sign in or create an account to continue your learning journey.</p>
+            </div>
+            
+            <form action="/api/auth" method="POST" class="space-y-5 relative z-10">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1">Username</label>
+                    <input type="text" name="username" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-colors">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1">Password</label>
+                    <input type="password" name="password" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-colors">
+                </div>
+                
+                <div class="flex flex-col gap-3 pt-2">
+                    <button type="submit" name="action" value="login" class="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-indigo-500/25 transition-all">
+                        Login
+                    </button>
+                    <button type="submit" name="action" value="signup" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-lg border border-slate-700 transition-colors">
+                        Create Account
+                    </button>
+                </div>
+            </form>
+        </div>
+    </body>
+    </html>
+    '''
+    return HTMLResponse(content=html_content)
+
+@app.post("/api/auth")
+async def handle_auth(
+    action: str = Form(...),
+    username: str = Form(...),
+    password: str = Form(...)
+):
+    from app.auth import authenticate_user, register_user
+    if action == "signup":
+        learner_id = register_user(username, password)
+        if not learner_id:
+            return HTMLResponse("Username already exists. <a href='/login'>Go back</a>", status_code=400)
+        
+        # User just signed up, needs onboarding
+        redirect_resp = RedirectResponse(url="/onboard", status_code=status.HTTP_303_SEE_OTHER)
+        redirect_resp.set_cookie(key="learner_id", value=learner_id)
+        return redirect_resp
+        
+    elif action == "login":
+        learner_id = authenticate_user(username, password)
+        if not learner_id:
+            return HTMLResponse("Invalid credentials. <a href='/login'>Go back</a>", status_code=400)
+            
+        from app.repository import get_learner
+        learner = get_learner(learner_id)
+        
+        # If they haven't finished onboard (no profile), send them to onboard.
+        # Otherwise, directly to their dashboard!
+        if learner and learner.profile:
+            redirect_resp = RedirectResponse(url=f"/dashboard/{learner_id}", status_code=status.HTTP_303_SEE_OTHER)
+        else:
+            redirect_resp = RedirectResponse(url="/onboard", status_code=status.HTTP_303_SEE_OTHER)
+            
+        redirect_resp.set_cookie(key="learner_id", value=learner_id)
+        return redirect_resp
+
+@app.get("/logout")
+async def logout():
+    redirect_resp = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    redirect_resp.delete_cookie("learner_id")
+    return redirect_resp
+
