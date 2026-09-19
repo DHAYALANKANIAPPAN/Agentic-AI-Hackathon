@@ -141,7 +141,7 @@ def generate_plan(gaps: GapList, hours_per_week: float, weeks_available: int) ->
     CRITICAL REQUIREMENTS:
     1. LIMIT to exactly 2 items total per week to be concise.
     2. Every week MUST include at least one practice task or project (set item_type strictly to "practice" or "project").
-    3. TO SAVE SPACE: OMIT the fields "objective_ref", "skill_ref", "status", "minutes_spent", "rating", "quiz_score", and "resources" from the items completely. ONLY output "id", "item_type", and "description".
+    3. TO SAVE SPACE: OMIT the fields "objective_ref", "skill_ref", "status", "minutes_spent", "rating", and "quiz_score". YOU MUST INCLUDE "resources" (limit to exactly 1 resource per item). ONLY output "id", "item_type", "description", and "resources".
     2. For URLs, NEVER invent links. Only provide safe search links. Example: https://www.youtube.com/results?search_query=Topic
     Assign a UUID for each item's id field.
 
