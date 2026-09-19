@@ -289,11 +289,14 @@ async def view_gaps(learner_id: str):
                     </span>
                 </a>
                 <div class="flex items-center gap-3">
+                    <a href="/dashboard/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
+                        Dashboard
+                    </a>
                     <a href="/plan/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
                         Weekly Plan
                     </a>
-                    <a href="/dashboard/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
-                        Dashboard
+                    <a href="/report/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
+                        Progress Report
                     </a>
                     <a href="/chat/{learner_id}" class="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-md transition-all flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
@@ -627,11 +630,14 @@ async def view_weekly_plan(learner_id: str, week: int = 1, replanned: Optional[i
                     </span>
                 </a>
                 <div class="flex items-center gap-3">
+                    <a href="/dashboard/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
+                        Dashboard
+                    </a>
                     <a href="/gaps/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
                         Skill Gaps
                     </a>
-                    <a href="/dashboard/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
-                        Dashboard
+                    <a href="/report/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
+                        Progress Report
                     </a>
                     <a href="/chat/{learner_id}" class="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-md transition-all flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
@@ -847,6 +853,10 @@ async def view_dashboard(learner_id: str):
                 <div class="flex items-center gap-3">
                     <a href="/plan/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">Weekly Plan</a>
                     <a href="/gaps/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">Skill Gaps</a>
+                    <a href="/report/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-purple-900/40 hover:bg-purple-900/60 text-purple-300 border border-purple-800/50 transition-all flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        <span>Progress Report</span>
+                    </a>
                     <a href="/chat/{learner_id}" class="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-md transition-all flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
                         <span>AI Tutor Chat</span>
@@ -860,6 +870,12 @@ async def view_dashboard(learner_id: str):
                 <div>
                     <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Learner Progress Dashboard</h1>
                     <p class="text-xs text-slate-400 mt-1">Learner ID: {learner_id} &bull; Target: {learner.gaps.target_role if learner.gaps else 'Role'}</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="/report/{learner_id}" class="px-4 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white shadow-lg transition-all flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        <span>View Full Progress Report</span>
+                    </a>
                 </div>
             </div>
 
@@ -1053,11 +1069,14 @@ async def view_chat(learner_id: str):
                     </span>
                 </a>
                 <div class="flex items-center gap-3">
+                    <a href="/dashboard/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
+                        Dashboard
+                    </a>
                     <a href="/plan/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
                         Weekly Plan
                     </a>
-                    <a href="/dashboard/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
-                        Dashboard
+                    <a href="/report/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
+                        Progress Report
                     </a>
                     <a href="/gaps/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
                         Skill Gaps
@@ -1293,4 +1312,487 @@ async def api_log_activity(
     if not updated_state:
         raise HTTPException(status_code=404, detail="Learner or item not found")
     return {"status": "success", "learner_id": learner_id, "item_id": item_id, "replanned": replanned}
+
+
+@app.get("/report/{learner_id}", response_class=HTMLResponse)
+async def view_progress_report(learner_id: str):
+    """Serve comprehensive visual progress report with metrics, skill status, and AI narrative."""
+    from app.services import generate_progress_report
+
+    try:
+        report = generate_progress_report(learner_id)
+    except ValueError:
+        raise HTTPException(status_code=404, detail="Learner not found")
+
+    stats = report["stats"]
+    skills = report["skills"]
+    weeks = report["weeks"]
+    struggles = report["struggles"]
+    replan_history = report["replan_history"]
+    next_rec = report["next_recommended"]
+    target_role = report["target_role"]
+    narrative = report["ai_narrative"]
+    generated_at = report["generated_at"][:16].replace("T", " ")
+
+    # Format narrative paragraphs
+    narrative_paragraphs = narrative.strip().split("\n\n")
+    narrative_html = "".join(
+        f"<p class='text-sm sm:text-base text-slate-200 leading-relaxed'>{p.strip()}</p>"
+        for p in narrative_paragraphs
+        if p.strip()
+    )
+
+    # Acquired skills HTML
+    if skills["acquired"]:
+        acquired_html = ""
+        for s in skills["acquired"]:
+            objs = "".join(
+                f"<li class='flex items-center gap-1.5 text-xs text-slate-300'><span class='text-emerald-400 font-bold'>✓</span> {o}</li>"
+                for o in s["objectives"]
+            )
+            objs_list = f"<ul class='mt-2 space-y-1 pl-1 border-t border-slate-800 pt-2'>{objs}</ul>" if objs else ""
+            acquired_html += f"""
+            <div class="p-4 rounded-xl bg-slate-900/80 border border-emerald-500/30 shadow-md">
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-sm text-white">{s['skill']}</span>
+                    <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Acquired</span>
+                </div>
+                {objs_list}
+            </div>
+            """
+    else:
+        acquired_html = "<div class='p-4 rounded-xl bg-slate-900/40 border border-slate-800 text-xs text-slate-400 italic'>No skills marked as fully acquired yet. Keep completing plan items!</div>"
+
+    # In-progress skills HTML
+    if skills["in_progress"]:
+        in_progress_html = ""
+        for s in skills["in_progress"]:
+            objs = "".join(
+                f"<li class='flex items-center gap-1.5 text-xs text-slate-300'><span class='text-cyan-400 font-bold'>•</span> {o}</li>"
+                for o in s["objectives"]
+            )
+            objs_list = f"<ul class='mt-2 space-y-1 pl-1 border-t border-slate-800 pt-2'>{objs}</ul>" if objs else ""
+            in_progress_html += f"""
+            <div class="p-4 rounded-xl bg-slate-900/80 border border-cyan-500/30 shadow-md">
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-sm text-white">{s['skill']}</span>
+                    <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">In Progress</span>
+                </div>
+                {objs_list}
+            </div>
+            """
+    else:
+        in_progress_html = "<div class='p-4 rounded-xl bg-slate-900/40 border border-slate-800 text-xs text-slate-400 italic'>No skills currently in partial progress.</div>"
+
+    # Missing gaps HTML
+    if skills["missing"]:
+        missing_html = ""
+        for s in skills["missing"]:
+            objs = "".join(
+                f"<li class='flex items-center gap-1.5 text-xs text-slate-300'><span class='text-purple-400 font-bold'>○</span> {o}</li>"
+                for o in s["objectives"]
+            )
+            objs_list = f"<ul class='mt-2 space-y-1 pl-1 border-t border-slate-800 pt-2'>{objs}</ul>" if objs else ""
+            missing_html += f"""
+            <div class="p-4 rounded-xl bg-slate-900/80 border border-purple-500/20 shadow-md">
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-sm text-white">{s['skill']}</span>
+                    <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">Target Gap (P{s['priority']})</span>
+                </div>
+                {objs_list}
+            </div>
+            """
+    else:
+        missing_html = "<div class='p-4 rounded-xl bg-slate-900/40 border border-slate-800 text-xs text-slate-400 italic'>All identified target skills have been addressed!</div>"
+
+    # Prior profile skills HTML
+    if skills["prior"]:
+        prior_html = ""
+        for p in skills["prior"]:
+            ev = f"<p class='text-[11px] text-slate-400 mt-1 italic'>{p['evidence']}</p>" if p.get("evidence") else ""
+            prior_html += f"""
+            <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-xs text-white">{p['name']}</span>
+                    <span class="text-[10px] uppercase font-semibold px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">{p['level']}</span>
+                </div>
+                {ev}
+            </div>
+            """
+    else:
+        prior_html = "<p class='text-xs text-slate-500 italic'>No prior skills on file.</p>"
+
+    # Week velocity HTML
+    weeks_html = ""
+    if weeks:
+        for w_key, w_data in weeks.items():
+            pct = w_data["pct"]
+            weeks_html += f"""
+            <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-sm text-white">Week {w_data['week_number']}</span>
+                        <span class="text-[11px] px-2 py-0.5 rounded font-semibold bg-slate-800 text-slate-300 border border-slate-700">
+                            {w_data['done']}/{w_data['total']} items completed
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-400">{w_data['goal']}</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="w-32 bg-slate-800 h-2.5 rounded-full overflow-hidden border border-slate-700">
+                        <div class="bg-gradient-to-r from-purple-500 to-cyan-400 h-full rounded-full" style="width: {pct}%"></div>
+                    </div>
+                    <span class="text-xs font-bold text-cyan-300 w-12 text-right">{pct}%</span>
+                </div>
+            </div>
+            """
+    else:
+        weeks_html = "<p class='text-xs text-slate-400 italic'>No weekly plan items found.</p>"
+
+    # Struggles & Adaptive Replan Journey HTML
+    struggle_items_html = ""
+    if struggles:
+        for st in struggles:
+            struggle_items_html += f"""
+            <div class="p-3.5 rounded-xl bg-rose-950/20 border border-rose-800/40 flex items-start justify-between gap-2">
+                <div class="space-y-0.5">
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-xs text-white">{st['skill']}</span>
+                        <span class="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded bg-rose-900/60 text-rose-200 border border-rose-700/50">{st['severity']}</span>
+                    </div>
+                    <p class="text-xs text-rose-200/90">{st['reason']}</p>
+                </div>
+                <span class="text-[10px] text-slate-400 font-mono">{st['timestamp'][:10]}</span>
+            </div>
+            """
+    else:
+        struggle_items_html = """
+        <div class="p-4 rounded-xl bg-emerald-950/20 border border-emerald-800/40 flex items-center gap-3">
+            <div class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">✓</div>
+            <div>
+                <p class="text-xs font-bold text-emerald-200">Optimal Learning Velocity</p>
+                <p class="text-[11px] text-slate-400">No friction alerts logged. Course progression has been fluid.</p>
+            </div>
+        </div>
+        """
+
+    # Replan reasons
+    replan_html = ""
+    if replan_history:
+        for r in replan_history:
+            replan_html += f"""
+            <li class="text-xs text-cyan-300/90 flex items-start gap-1.5">
+                <span class="text-cyan-400 font-bold">•</span>
+                <span>{r}</span>
+            </li>
+            """
+    else:
+        replan_html = "<li class='text-xs text-slate-400 italic'>Initial baseline plan active (version 1).</li>"
+
+    # Next recommendation card HTML
+    if next_rec:
+        next_rec_html = f"""
+        <div class="p-5 rounded-2xl bg-gradient-to-r from-purple-950/50 to-indigo-950/50 border border-purple-500/30 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="space-y-1">
+                <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                    Week {next_rec['week']} Next Target
+                </span>
+                <h4 class="font-bold text-sm sm:text-base text-white">{next_rec['description']}</h4>
+                <p class="text-xs text-slate-300">Target Skill: <strong class="text-purple-300">{next_rec['skill']}</strong> &bull; Resource: {next_rec['resource']}</p>
+            </div>
+            <a href="{next_rec['url']}" target="_blank" rel="noopener noreferrer"
+               class="px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white shadow transition-all whitespace-nowrap self-start sm:self-center">
+                Launch Module &rarr;
+            </a>
+        </div>
+        """
+    else:
+        next_rec_html = """
+        <div class="p-5 rounded-2xl bg-emerald-950/30 border border-emerald-800/40 text-center space-y-1">
+            <h4 class="font-bold text-sm text-emerald-200">Curriculum Completed! 🎉</h4>
+            <p class="text-xs text-slate-400">All planned items have been finished. Ready for new challenges or project evaluations.</p>
+        </div>
+        """
+
+    html_content = f"""
+    <!DOCTYPE html>
+    <html lang="en" class="h-full bg-slate-950 text-slate-100">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Progress Report | EduPath AI</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {{
+                theme: {{
+                    extend: {{
+                        fontFamily: {{
+                            sans: ['Inter', 'sans-serif'],
+                            heading: ['Outfit', 'sans-serif'],
+                        }}
+                    }}
+                }}
+            }}
+        </script>
+        <style>
+            .glass-card {{
+                background: rgba(15, 23, 42, 0.85);
+                backdrop-filter: blur(16px);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+            }}
+            .gradient-text {{
+                background: linear-gradient(135deg, #a78bfa 0%, #38bdf8 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }}
+            @media print {{
+                header, .no-print {{ display: none !important; }}
+                body {{ background: #0f172a !important; color: #f8fafc !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }}
+                .glass-card {{ background: #1e293b !important; border: 1px solid #334155 !important; box-shadow: none !important; }}
+            }}
+        </style>
+    </head>
+    <body class="min-h-full flex flex-col font-sans antialiased bg-slate-950 text-slate-100">
+        <!-- Navigation -->
+        <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur sticky top-0 z-20 no-print">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+                <a href="/onboard" class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-400 flex items-center justify-center font-heading font-extrabold text-white text-lg shadow-lg">
+                        E
+                    </div>
+                    <span class="font-heading font-bold text-xl tracking-tight text-white">
+                        EduPath <span class="text-xs uppercase font-semibold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">Report</span>
+                    </span>
+                </a>
+                <div class="flex items-center gap-3">
+                    <a href="/dashboard/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
+                        Dashboard
+                    </a>
+                    <a href="/plan/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
+                        Weekly Plan
+                    </a>
+                    <a href="/chat/{learner_id}" class="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-md transition-all flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                        <span>AI Tutor Chat</span>
+                    </a>
+                    <a href="/gaps/{learner_id}" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
+                        Skill Gaps
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 space-y-8">
+            <!-- Hero Header -->
+            <div class="glass-card rounded-2xl p-6 sm:p-8 shadow-xl border border-slate-800 relative overflow-hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="px-2.5 py-0.5 rounded text-[11px] font-bold uppercase bg-gradient-to-r from-purple-500/20 to-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                                Official Progress Evaluation
+                            </span>
+                            <span class="text-xs text-slate-400 font-mono">Plan v{stats['plan_version']}</span>
+                        </div>
+                        <h1 class="text-2xl sm:text-4xl font-extrabold text-white font-heading tracking-tight">
+                            Progress & Competency Report
+                        </h1>
+                        <p class="text-xs sm:text-sm text-slate-300 mt-1">
+                            Learner: <strong class="text-white font-mono">{learner_id}</strong> &bull; Target Career Role: <span class="gradient-text font-bold">{target_role}</span> &bull; Generated: {generated_at}
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-3 no-print">
+                        <button onclick="window.print()" class="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all flex items-center gap-2 shadow">
+                            <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                            <span>Print / Save PDF</span>
+                        </button>
+                        <a href="/dashboard/{learner_id}" class="px-4 py-2 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg transition-all flex items-center gap-1.5">
+                            <span>Back to Dashboard</span>
+                            &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Executive AI Coach Narrative -->
+            <div class="glass-card rounded-2xl p-6 sm:p-8 border border-purple-500/30 shadow-2xl relative overflow-hidden">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 to-cyan-400 flex items-center justify-center font-extrabold text-white text-sm shadow-lg">
+                        AI
+                    </div>
+                    <div>
+                        <h2 class="text-base sm:text-lg font-bold text-white font-heading">
+                            Executive Learning Narrative
+                        </h2>
+                        <span class="text-[11px] text-purple-300/80 font-medium">Generated by EduPath AI Agent</span>
+                    </div>
+                </div>
+                <div class="space-y-3 bg-slate-900/60 p-5 rounded-xl border border-slate-800/80">
+                    {narrative_html}
+                </div>
+            </div>
+
+            <!-- Next Immediate Priority -->
+            <div>
+                <h3 class="text-xs uppercase font-bold text-slate-400 tracking-wider mb-3">Recommended Next Step</h3>
+                {next_rec_html}
+            </div>
+
+            <!-- High Level KPI Grid -->
+            <div>
+                <h3 class="text-xs uppercase font-bold text-slate-400 tracking-wider mb-3">Core Performance Metrics</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-md">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs uppercase font-semibold text-slate-400">Curriculum Completion</span>
+                            <span class="text-xs font-bold text-cyan-400">{stats['completion_pct']}%</span>
+                        </div>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-white mt-2 font-heading">
+                            {stats['items_done']} <span class="text-sm font-normal text-slate-500">/ {stats['total_items']} items</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-2 rounded-full mt-3 overflow-hidden border border-slate-700">
+                            <div class="bg-gradient-to-r from-purple-500 to-cyan-400 h-full rounded-full" style="width: {stats['completion_pct']}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-md">
+                        <span class="text-xs uppercase font-semibold text-slate-400">Time Invested</span>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-cyan-400 mt-2 font-heading">
+                            {stats['hours_spent']}h
+                        </div>
+                        <p class="text-xs text-slate-400 mt-3">{stats['total_minutes']} study minutes logged</p>
+                    </div>
+
+                    <div class="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-md">
+                        <span class="text-xs uppercase font-semibold text-slate-400">Mastered Competencies</span>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-emerald-400 mt-2 font-heading">
+                            {stats['skills_acquired_count']} <span class="text-sm font-normal text-slate-500">skills</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-3">{stats['skills_in_progress_count']} skills in active practice</p>
+                    </div>
+
+                    <div class="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-md">
+                        <span class="text-xs uppercase font-semibold text-slate-400">Adaptive Iterations</span>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-purple-400 mt-2 font-heading">
+                            v{stats['plan_version']}
+                        </div>
+                        <p class="text-xs text-slate-400 mt-3">{stats['struggle_count']} struggle alerts handled</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Competency Breakdown -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Acquired Skills -->
+                <div class="glass-card rounded-2xl p-5 border border-slate-800 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-white font-heading flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                            Acquired Skills ({len(skills['acquired'])})
+                        </h3>
+                    </div>
+                    <div class="space-y-3">
+                        {acquired_html}
+                    </div>
+                </div>
+
+                <!-- In Progress Skills -->
+                <div class="glass-card rounded-2xl p-5 border border-slate-800 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-white font-heading flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+                            In Progress ({len(skills['in_progress'])})
+                        </h3>
+                    </div>
+                    <div class="space-y-3">
+                        {in_progress_html}
+                    </div>
+                </div>
+
+                <!-- Pending Target Gaps -->
+                <div class="glass-card rounded-2xl p-5 border border-slate-800 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-white font-heading flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-purple-400"></span>
+                            Upcoming Gaps ({len(skills['missing'])})
+                        </h3>
+                    </div>
+                    <div class="space-y-3">
+                        {missing_html}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Baseline Skills From Resume -->
+            <div class="glass-card rounded-2xl p-5 border border-slate-800 space-y-3">
+                <h3 class="text-xs uppercase font-bold text-slate-400 tracking-wider">Baseline Background Skills (From Resume)</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    {prior_html}
+                </div>
+            </div>
+
+            <!-- Weekly Progress Breakdown -->
+            <div class="glass-card rounded-2xl p-6 border border-slate-800 space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-base font-bold text-white font-heading">
+                        Curriculum Velocity by Week
+                    </h3>
+                    <span class="text-xs text-slate-400">{len(weeks)} Weeks Total</span>
+                </div>
+                <div class="space-y-3">
+                    {weeks_html}
+                </div>
+            </div>
+
+            <!-- Adaptive Journey & Struggle Resolution -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Struggle Logs -->
+                <div class="glass-card rounded-2xl p-6 border border-slate-800 space-y-4">
+                    <h3 class="text-sm font-bold text-white font-heading flex items-center gap-2">
+                        <svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        Friction & Struggle Records ({len(struggles)})
+                    </h3>
+                    <div class="space-y-2.5">
+                        {struggle_items_html}
+                    </div>
+                </div>
+
+                <!-- Replan Events -->
+                <div class="glass-card rounded-2xl p-6 border border-slate-800 space-y-4">
+                    <h3 class="text-sm font-bold text-white font-heading flex items-center gap-2">
+                        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        Agentic Adaptation History
+                    </h3>
+                    <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
+                        <ul class="space-y-2">
+                            {replan_html}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-auto border-t border-slate-900 py-6 text-center text-xs text-slate-500 no-print">
+            <p>EduPath Agentic AI Hackathon &bull; Phase 4 Evaluation Report &bull; Powered by FastAPI & Agentic AI</p>
+        </footer>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=html_content)
+
+
+@app.get("/api/learners/{learner_id}/report")
+async def api_get_learner_report(learner_id: str):
+    """JSON API endpoint returning the full progress report data for external consumers."""
+    from app.services import generate_progress_report
+
+    try:
+        report_data = generate_progress_report(learner_id)
+        return {"status": "success", "report": report_data}
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate report: {str(e)}")
 
