@@ -1,6 +1,6 @@
 from typing import List, Dict, Any
 from shared.schemas.models import (
-    SkillProfile, GapList, Resource, WeeklyPlan, LearnerState, ProgressStats, SkillLevel, GapStatus, Gap, Objective, Skill
+    SkillProfile, GapList, Resource, WeeklyPlan, PlanItem, ResourceType, LearnerState, ProgressStats, SkillLevel, GapStatus, Gap, Objective, Skill
 )
 from ai import llm
 from ai.doc_reader import extract_text_from_file
@@ -73,11 +73,86 @@ def find_gaps(profile: SkillProfile, target_role: str) -> GapList:
             gaps=[Gap(required_skill="Core Concepts", status=GapStatus.MISSING, priority=1, objectives=[Objective(description="Learn fundamentals", hours_estimated=10.0)])]
         )
 
+from pydantic import BaseModel
+
+class ResourceListWrapper(BaseModel):
+    resources: List[Resource]
+
 def recommend_resources(objective_desc: str, level: SkillLevel) -> List[Resource]:
-    pass
+    """Generates a list of recommended resources for a specific learning objective."""
+    prompt = f"""
+    Suggest 3 high-quality learning resources to help a student achieve the following objective:
+    "{objective_desc}"
+    
+    The student's current level for this topic is: {level.value}.
+    Ensure the resources are of type VIDEO, DOCS, COURSE, ARTICLE, or PRACTICE.
+    Return a list of resources.
+    """
+    
+    # We use a local wrapper to parse the list using generate_json
+    try:
+        wrapper = llm.generate_json(prompt, ResourceListWrapper)
+        return wrapper.resources
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning(f"Failed to generate resources: {e}")
+        return [
+            Resource(
+                title=f"Basics of {objective_desc}",
+                url="https://google.com/search?q=" + objective_desc.replace(' ', '+'),
+                type=ResourceType.ARTICLE,
+                level=level,
+                time_estimate_minutes=60
+            )
+        ]
+
+class WeekItemWrapper(BaseModel):
+    week_number: int
+    goal_sentence: str
+    items: List[PlanItem]
+
+class WeeklyPlanWrapper(BaseModel):
+    weeks: List[WeekItemWrapper]
 
 def generate_plan(gaps: GapList, hours_per_week: float, weeks_available: int) -> WeeklyPlan:
-    pass
+    """Generates a study plan based on identified skill gaps and time constraints."""
+    import uuid
+    prompt = f"""
+    Create a highly structured {weeks_available}-week study plan for someone transitioning to a "{gaps.target_role}" role.
+    They can commit {hours_per_week} hours per week.
+    
+    Here are their skill gaps and objectives:
+    {gaps.model_dump_json(indent=2)}
+    
+    Allocate the objectives across the {weeks_available} weeks.
+    For each week (week_number 1 to {weeks_available}), provide a 'goal_sentence' and a list of 'items'.
+    Assign a UUID for each item's id field.
+    """
+    
+    try:
+        wrapper = llm.generate_json(prompt, WeeklyPlanWrapper)
+        
+        # Convert wrapper to the real WeeklyPlan
+        plan = WeeklyPlan(version=1, goal_sentences={}, weeks={})
+        for w in wrapper.weeks:
+            plan.goal_sentences[w.week_number] = w.goal_sentence
+            plan.weeks[w.week_number] = w.items
+            
+            # Ensure UUIDs are generated if the LLM forgot
+            for item in w.items:
+                if not item.id or len(str(item.id)) < 5:
+                    item.id = str(uuid.uuid4())
+                    
+        return plan
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning(f"Failed to generate plan: {e}")
+        # Fallback empty plan
+        return WeeklyPlan(
+            version=1,
+            goal_sentences={1: "Begin working on your primary gaps."},
+            weeks={1: []}
+        )
 
 def replan(state: LearnerState) -> WeeklyPlan:
     pass
