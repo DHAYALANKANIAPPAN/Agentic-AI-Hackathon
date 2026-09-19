@@ -3,7 +3,14 @@ import os
 import uuid
 from datetime import datetime, timedelta
 from typing import Optional, List, Tuple, Dict
-from app.provider import analyze_profile, find_gaps, generate_plan, replan, answer_question
+from app.provider import (
+    analyze_profile,
+    find_gaps,
+    generate_plan,
+    replan,
+    answer_question,
+    write_report_narrative,
+)
 from app.repository import (
     save_learner,
     get_learner,
@@ -598,5 +605,140 @@ def chat_with_agent(
     save_chat_message(learner_id, "user", question, db_path=db_path)
     save_chat_message(learner_id, "assistant", answer, db_path=db_path)
     return answer
+
+
+def generate_progress_report(
+    learner_id: str,
+    db_path: str = "edupath.db",
+) -> dict:
+    """Generate comprehensive progress report with metrics, skill status, struggle history, and AI narrative."""
+    learner = get_learner(learner_id, db_path=db_path)
+    if not learner:
+        raise ValueError(f"Learner {learner_id} not found")
+
+    stats = compute_stats(learner)
+
+    total_items = 0
+    completed_items = 0
+    in_progress_items = 0
+    todo_items = 0
+    week_breakdown = {}
+
+    if learner.plan and learner.plan.weeks:
+        for w_num in sorted(learner.plan.weeks.keys()):
+            items = learner.plan.weeks[w_num]
+            w_done = sum(1 for itm in items if itm.status == ItemStatus.DONE)
+            w_total = len(items)
+            goal = (
+                learner.plan.goal_sentences.get(w_num, f"Week {w_num} Focus")
+                if learner.plan.goal_sentences
+                else f"Week {w_num} Focus"
+            )
+            week_breakdown[str(w_num)] = {
+                "week_number": w_num,
+                "total": w_total,
+                "done": w_done,
+                "pct": round((w_done / w_total * 100), 1) if w_total > 0 else 0.0,
+                "goal": goal,
+            }
+            total_items += w_total
+            completed_items += w_done
+            todo_items += sum(1 for itm in items if itm.status == ItemStatus.TODO)
+
+    remaining_items = total_items - completed_items
+    completion_pct = round((completed_items / total_items * 100), 1) if total_items > 0 else 0.0
+
+    narrative = write_report_narrative(stats, learner)
+
+    acquired_skills = []
+    in_progress_skills = []
+    missing_skills = []
+    if learner.gaps and learner.gaps.gaps:
+        for g in learner.gaps.gaps:
+            status_val = g.status.value if hasattr(g.status, "value") else str(g.status).lower()
+            item_info = {
+                "skill": g.required_skill,
+                "status": status_val,
+                "priority": g.priority,
+                "objectives": [obj.description for obj in g.objectives] if g.objectives else [],
+            }
+            if status_val == "has":
+                acquired_skills.append(item_info)
+            elif status_val == "partial":
+                in_progress_skills.append(item_info)
+            else:
+                missing_skills.append(item_info)
+
+    prior_skills = []
+    if learner.profile and learner.profile.skills:
+        for sk in learner.profile.skills:
+            prior_skills.append({
+                "name": sk.name,
+                "level": sk.level.value if hasattr(sk.level, "value") else str(sk.level),
+                "evidence": sk.evidence or "",
+            })
+
+    total_study_minutes = sum(a.minutes_spent for a in learner.activity_log)
+    struggle_count = len(learner.struggle_flags)
+    struggles_list = [
+        {
+            "skill": f.skill_name,
+            "reason": f.reason,
+            "severity": f.severity,
+            "timestamp": str(getattr(f, "timestamp", "")) if getattr(f, "timestamp", None) else "",
+        }
+        for f in learner.struggle_flags
+    ]
+
+    replan_history = []
+    if learner.plan and learner.plan.change_reasons:
+        replan_history = list(learner.plan.change_reasons)
+
+    next_recommended_item = None
+    if learner.plan and learner.plan.weeks:
+        for w_num in sorted(learner.plan.weeks.keys()):
+            for itm in learner.plan.weeks[w_num]:
+                if itm.status != ItemStatus.DONE:
+                    next_recommended_item = {
+                        "week": w_num,
+                        "id": itm.id,
+                        "description": itm.description,
+                        "skill": itm.skill_ref,
+                        "resource": itm.resources[0].title if itm.resources else "Recommended Module",
+                        "url": itm.resources[0].url if itm.resources else "#",
+                    }
+                    break
+            if next_recommended_item:
+                break
+
+    return {
+        "learner_id": learner.id,
+        "target_role": learner.gaps.target_role if learner.gaps else "Specialist",
+        "generated_at": datetime.utcnow().isoformat(),
+        "stats": {
+            "items_done": stats.items_done,
+            "total_items": total_items,
+            "remaining_items": remaining_items,
+            "completion_pct": completion_pct,
+            "hours_spent": stats.hours_spent,
+            "total_minutes": total_study_minutes,
+            "skills_acquired_count": len(acquired_skills),
+            "skills_in_progress_count": len(in_progress_skills),
+            "skills_missing_count": len(missing_skills),
+            "struggle_count": struggle_count,
+            "plan_version": learner.plan.version if learner.plan else 1,
+        },
+        "ai_narrative": narrative,
+        "skills": {
+            "acquired": acquired_skills,
+            "in_progress": in_progress_skills,
+            "missing": missing_skills,
+            "prior": prior_skills,
+        },
+        "weeks": week_breakdown,
+        "struggles": struggles_list,
+        "replan_history": replan_history,
+        "next_recommended": next_recommended_item,
+    }
 
 

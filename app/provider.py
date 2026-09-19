@@ -27,25 +27,25 @@ USE_REAL_WRITE_REPORT = False
 # --- Exported Functions ---
 
 def extract_text_from_file(*args, **kwargs):
-    return (real_ai if USE_REAL_EXTRACT_TEXT else mock_ai).extract_text_from_file(*args, **kwargs)
+    return (real_ai if (USE_REAL_EXTRACT_TEXT and real_ai is not None) else mock_ai).extract_text_from_file(*args, **kwargs)
 
 def analyze_profile(*args, **kwargs):
-    return (real_ai if USE_REAL_ANALYZE_PROFILE else mock_ai).analyze_profile(*args, **kwargs)
+    return (real_ai if (USE_REAL_ANALYZE_PROFILE and real_ai is not None) else mock_ai).analyze_profile(*args, **kwargs)
 
 def find_gaps(*args, **kwargs):
-    return (real_ai if USE_REAL_FIND_GAPS else mock_ai).find_gaps(*args, **kwargs)
+    return (real_ai if (USE_REAL_FIND_GAPS and real_ai is not None) else mock_ai).find_gaps(*args, **kwargs)
 
 def recommend_resources(*args, **kwargs):
-    return (real_ai if USE_REAL_RECOMMEND_RESOURCES else mock_ai).recommend_resources(*args, **kwargs)
+    return (real_ai if (USE_REAL_RECOMMEND_RESOURCES and real_ai is not None) else mock_ai).recommend_resources(*args, **kwargs)
 
 def generate_plan(*args, **kwargs):
-    return (real_ai if USE_REAL_GENERATE_PLAN else mock_ai).generate_plan(*args, **kwargs)
+    return (real_ai if (USE_REAL_GENERATE_PLAN and real_ai is not None) else mock_ai).generate_plan(*args, **kwargs)
 
 def replan(*args, **kwargs):
-    return (real_ai if USE_REAL_REPLAN else mock_ai).replan(*args, **kwargs)
+    return (real_ai if (USE_REAL_REPLAN and real_ai is not None) else mock_ai).replan(*args, **kwargs)
 
 def answer_question(*args, **kwargs):
-    return (real_ai if USE_REAL_ANSWER_QUESTION else mock_ai).answer_question(*args, **kwargs)
+    return (real_ai if (USE_REAL_ANSWER_QUESTION and real_ai is not None) else mock_ai).answer_question(*args, **kwargs)
 
 def write_report_narrative(*args, **kwargs):
-    return (real_ai if USE_REAL_WRITE_REPORT else mock_ai).write_report_narrative(*args, **kwargs)
+    return (real_ai if (USE_REAL_WRITE_REPORT and real_ai is not None) else mock_ai).write_report_narrative(*args, **kwargs)
