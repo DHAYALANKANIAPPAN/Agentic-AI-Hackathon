@@ -80,10 +80,73 @@ def generate_plan(gaps: GapList, hours_per_week: float, weeks_available: int) ->
     pass
 
 def replan(state: LearnerState) -> WeeklyPlan:
-    pass
+    """Adjusts the WeeklyPlan based on the learner's struggles and progress."""
+    import uuid
+    prompt = f"""
+    The learner has been studying for the role of "{state.gaps.target_role if state.gaps else 'Unknown'}".
+    Here are the struggles they reported recently:
+    {[s.model_dump_json() for s in state.struggle_flags]}
+    
+    Here is their current plan:
+    {state.plan.model_dump_json() if state.plan else "No plan"}
+    
+    Generate an updated {state.weeks_available}-week plan that addresses their struggles by allocating more time or adding practice items for the concepts they found difficult.
+    Provide a 'goal_sentence' for each week and a list of 'items'.
+    Assign a UUID for each item's id field.
+    """
+    
+    try:
+        wrapper = llm.generate_json(prompt, WeeklyPlanWrapper)
+        plan = WeeklyPlan(version=(state.plan.version + 1 if state.plan else 1), change_reasons=["Adjusted based on recent struggles"], goal_sentences={}, weeks={})
+        for w in wrapper.weeks:
+            plan.goal_sentences[w.week_number] = w.goal_sentence
+            plan.weeks[w.week_number] = w.items
+            for item in w.items:
+                if not item.id or len(str(item.id)) < 5:
+                    item.id = str(uuid.uuid4())
+        return plan
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning(f"Failed to replan: {e}")
+        return state.plan if state.plan else WeeklyPlan()
 
 def answer_question(state: LearnerState, chat_history: List[Dict[str, str]], question: str) -> str:
-    pass
+    """Answers a user's question directly, aware of their current learning state."""
+    history_text = "\n".join([f"{msg.get('role', 'user')}: {msg.get('content', '')}" for msg in chat_history])
+    
+    prompt = f"""
+    You are an AI learning assistant helping a student transition to "{state.gaps.target_role if state.gaps else 'Unknown'}".
+    
+    Recent Chat History:
+    {history_text}
+    
+    Student's New Question:
+    {question}
+    
+    Please provide a concise, encouraging, and accurate answer to the student's question. 
+    Keep it under 3 paragraphs.
+    """
+    
+    try:
+        return llm.generate_text(prompt)
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning(f"Failed to answer question: {e}")
+        return "I'm sorry, I'm having trouble connecting to my knowledge base right now. Please try asking again later!"
 
 def write_report_narrative(stats: ProgressStats, state: LearnerState) -> str:
-    pass
+    """Writes an encouraging progress report narrative."""
+    prompt = f"""
+    Write a short, encouraging 2-paragraph progress report for a student.
+    They have completed {stats.items_done} items and spent {stats.hours_spent} hours studying.
+    They are aiming for the role of "{state.gaps.target_role if state.gaps else 'Unknown'}".
+    
+    Acknowledge their hard work and tell them what they should focus on next based on their current progress.
+    """
+    
+    try:
+        return llm.generate_text(prompt)
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning(f"Failed to write report: {e}")
+        return f"Great job! You have completed {stats.items_done} items and studied for {stats.hours_spent} hours. Keep up the fantastic work on your journey!"
