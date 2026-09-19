@@ -90,6 +90,7 @@ def generate_json(prompt: str, response_schema: Type[T], model_name: str = "meta
             
         except (json.JSONDecodeError, ValidationError) as e:
             logger.warning(f"Parsing Error (Attempt {attempt + 1}/{max_retries}): {e}")
+            logger.warning(f"RAW TEXT: {raw_text}")
             if attempt == max_retries - 1:
                 raise ValueError("Failed to generate valid JSON after retries.") from e
                 
