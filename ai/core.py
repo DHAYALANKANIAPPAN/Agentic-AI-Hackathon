@@ -28,9 +28,9 @@ def analyze_profile(form_text: str, document_texts: List[str]) -> SkillProfile:
     return llm.generate_json(prompt, SkillProfile)
 
 
-def find_gaps(profile: SkillProfile, target_role: str) -> GapList:
+def find_gaps(profile_text: str, target_role: str) -> GapList:
     """Produces a GapList from a profile and a target role."""
-    cache_key = profile.model_dump_json() + target_role
+    cache_key = str(profile_text)[:100] + target_role
     if cache_key in _cache_gaps: return _cache_gaps[cache_key]
     
     # Fallback lists in case LLM fails
@@ -50,15 +50,15 @@ def find_gaps(profile: SkillProfile, target_role: str) -> GapList:
         )
     }
     
-    skills_context = "\n".join([f"- {s.name} ({s.level.value})" for s in profile.skills])
+    
     
     prompt = f"""
     The user wants to become a "{target_role}".
-    Here are their current skills:
-    {skills_context if skills_context else "(No skills listed)"}
+    Here is their resume/background text:
+    {profile_text}
     
     1. Generate the key required skills for a {target_role}.
-    2. Compare them against the user's current skills.
+    2. Compare them against the user's background.
     3. Label each required skill as 'has', 'partial', or 'missing'.
     4. Assign a priority (1 is highest priority/foundational, higher numbers are lower priority/advanced).
     5. For each 'partial' or 'missing' skill, generate 2 to 3 structured learning objectives with hour estimates.
