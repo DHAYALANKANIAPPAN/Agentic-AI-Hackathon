@@ -13,15 +13,26 @@ T = TypeVar('T', bound=BaseModel)
 # We assume GEMINI_API_KEY is in the environment
 client = genai.Client()
 
-def generate_text(prompt: str, model_name: str = "gemini-2.5-flash") -> str:
+def generate_text(prompt: str, model_name: str = "gemini-3.6-flash") -> str:
     """Generates plain text output."""
-    response = client.models.generate_content(
-        model=model_name,
-        contents=prompt
-    )
-    return response.text
+    import time
+    from google.genai import errors
+    
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            response = client.models.generate_content(
+                model=model_name,
+                contents=prompt
+            )
+            return response.text
+        except errors.APIError as e:
+            logger.warning(f"API Error in text (Attempt {attempt + 1}/{max_retries}): {e}")
+            if attempt == max_retries - 1:
+                raise
+            time.sleep(2)
 
-def generate_json(prompt: str, response_schema: Type[T], model_name: str = "gemini-2.5-flash") -> T:
+def generate_json(prompt: str, response_schema: Type[T], model_name: str = "gemini-3.6-flash") -> T:
     """Generates JSON output validated against a Pydantic model with one retry."""
     config = types.GenerateContentConfig(
         response_mime_type="application/json",
@@ -29,7 +40,11 @@ def generate_json(prompt: str, response_schema: Type[T], model_name: str = "gemi
         temperature=0.2
     )
     
-    for attempt in range(2):
+    import time
+    from google.genai import errors
+    
+    max_retries = 3
+    for attempt in range(max_retries):
         try:
             response = client.models.generate_content(
                 model=model_name,
@@ -39,9 +54,16 @@ def generate_json(prompt: str, response_schema: Type[T], model_name: str = "gemi
             # Try to parse and validate
             parsed = json.loads(response.text)
             return response_schema.model_validate(parsed)
+            
+        except errors.APIError as e:
+            logger.warning(f"API Error (Attempt {attempt + 1}/{max_retries}): {e}")
+            if attempt == max_retries - 1:
+                raise ValueError("API is currently unavailable after multiple retries.") from e
+            time.sleep(2) # Wait 2 seconds before retrying
+            
         except (json.JSONDecodeError, ValidationError) as e:
-            logger.warning(f"Attempt {attempt + 1} failed for generate_json: {e}")
-            if attempt == 1:
+            logger.warning(f"Parsing Error (Attempt {attempt + 1}/{max_retries}): {e}")
+            if attempt == max_retries - 1:
                 raise ValueError("Failed to generate valid JSON after retries.") from e
-    
+                
     raise ValueError("Unexpected error in generate_json")
