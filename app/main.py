@@ -531,7 +531,7 @@ async def view_gaps(learner_id: str):
                             <div class="px-4 py-3 border-b border-slate-800">
                                 <p class="text-xs text-slate-400 font-mono truncate">Logged in</p>
                             </div>
-                            <a href="/profile" class="px-4 py-2 text-sm text-slate-300 hover:bg-purple-900/40 hover:text-purple-300 transition-colors">Your Uploads</a>
+                            <a href="/profile" class="px-4 py-2 text-sm text-slate-300 hover:bg-purple-900/40 hover:text-purple-300 transition-colors">Upload Documents</a>
                             <a href="/logout" class="px-4 py-2 text-sm text-rose-400 hover:bg-rose-900/40 transition-colors border-t border-slate-800">Sign out</a>
                         </div>
                     </div>
@@ -913,7 +913,7 @@ async def view_weekly_plan(learner_id: str, week: int = 1, replanned: Optional[i
                             <div class="px-4 py-3 border-b border-slate-800">
                                 <p class="text-xs text-slate-400 font-mono truncate">Logged in</p>
                             </div>
-                            <a href="/profile" class="px-4 py-2 text-sm text-slate-300 hover:bg-purple-900/40 hover:text-purple-300 transition-colors">Your Uploads</a>
+                            <a href="/profile" class="px-4 py-2 text-sm text-slate-300 hover:bg-purple-900/40 hover:text-purple-300 transition-colors">Upload Documents</a>
                             <a href="/logout" class="px-4 py-2 text-sm text-rose-400 hover:bg-rose-900/40 transition-colors border-t border-slate-800">Sign out</a>
                         </div>
                     </div>
@@ -2361,10 +2361,16 @@ async def profile_page(request: Request):
     roles_html = ""
     for role in roles:
         roles_html += f'''
-        <a href="/dashboard/{role['learner_id']}" class="block p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-800 transition-colors">
-            <h3 class="text-lg font-bold text-white">{role['target_role']}</h3>
-            <p class="text-sm text-slate-400">Manage uploads and dashboard →</p>
-        </a>
+        <div class="flex items-center justify-between p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-800 transition-colors">
+            <div class="flex flex-col">
+                <h3 class="text-lg font-bold text-white">{role['target_role']}</h3>
+                <p class="text-xs text-slate-400 mt-1 flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Initial Document Uploaded
+                </p>
+            </div>
+            <a href="/dashboard/{role['learner_id']}" class="px-4 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-md transition-all">Switch Role</a>
+        </div>
         '''
         
     if not roles:
