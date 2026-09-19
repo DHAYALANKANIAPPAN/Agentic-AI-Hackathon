@@ -8,3 +8,5 @@ httpx
 google-genai
 openai
 python-dotenv
+PyPDF2
+python-docx

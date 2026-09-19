@@ -9,7 +9,10 @@ Serves:
 
 from contextlib import asynccontextmanager
 from typing import Optional
-from fastapi import FastAPI, Form, HTTPException, Request, status
+from fastapi import FastAPI, Form, File, UploadFile, HTTPException, Request, status
+import tempfile
+import os
+from ai.doc_reader import extract_text_from_file
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from app.repository import init_db, get_learner
 from app.services import onboard_learner
@@ -31,8 +34,69 @@ app = FastAPI(
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
-    """Redirect home to onboarding page."""
-    return RedirectResponse(url="/onboard")
+    """Serve the landing page."""
+    html_content = """
+    <!DOCTYPE html>
+    <html lang="en" class="h-full bg-slate-950 text-slate-100">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>EduPath | Agentic AI Learning Coach</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+        <style>
+            .glass-card { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+            .gradient-text { background: linear-gradient(135deg, #a78bfa 0%, #38bdf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        </style>
+    </head>
+    <body class="min-h-full flex flex-col font-sans antialiased bg-slate-950 text-slate-100">
+        <!-- Navigation -->
+        <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur sticky top-0 z-20">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-400 flex items-center justify-center font-heading font-extrabold text-white text-lg shadow-lg">E</div>
+                    <span class="font-heading font-bold text-xl tracking-tight text-white">EduPath</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 flex items-center justify-center p-6 text-center">
+            <div class="max-w-2xl space-y-8">
+                <h1 class="text-5xl font-extrabold font-heading text-white">
+                    Your Personalized <span class="gradient-text">AI Learning Coach</span>
+                </h1>
+                <p class="text-lg text-slate-400">
+                    EduPath is an autonomous agentic platform that analyzes your current skills, identifies the gaps to your dream career, and generates a dynamic weekly curriculum that adapts to your progress.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4 pt-4">
+                    <a href="/onboard" class="px-8 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 shadow-lg shadow-purple-600/30 transition-all text-lg">
+                        Get Started
+                    </a>
+                    <a href="/demo/seed" class="px-8 py-3 rounded-xl font-bold text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all text-lg">
+                        View Live Demo
+                    </a>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-12 text-left">
+                    <div class="glass-card p-6 rounded-2xl">
+                        <div class="text-cyan-400 mb-2">🎯 1. Gap Analysis</div>
+                        <p class="text-sm text-slate-400">Upload your resume to instantly benchmark your skills against industry requirements.</p>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl">
+                        <div class="text-purple-400 mb-2">📅 2. Dynamic Plan</div>
+                        <p class="text-sm text-slate-400">Get a custom weekly roadmap that automatically adapts if you struggle with concepts.</p>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl">
+                        <div class="text-indigo-400 mb-2">🤖 3. AI Tutor</div>
+                        <p class="text-sm text-slate-400">Chat with a context-aware AI tutor who understands exactly where you are in your journey.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=html_content)
 
 
 @app.get("/onboard", response_class=HTMLResponse)
@@ -109,7 +173,7 @@ async def onboard_form():
             <div class="glass-card rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
                 <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 via-indigo-500 to-cyan-400"></div>
 
-                <form action="/onboard" method="POST" onsubmit="showLoading()" class="space-y-6">
+                <form action="/onboard" method="POST" enctype="multipart/form-data" onsubmit="showLoading()" class="space-y-6">
                     <!-- Target Role -->
                     <div>
                         <label for="target_role" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
@@ -125,9 +189,20 @@ async def onboard_form():
                         <label for="resume_text" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
                             Resume or Background Profile <span class="text-purple-400">*</span>
                         </label>
-                        <textarea id="resume_text" name="resume_text" rows="8" required
+                        <textarea id="resume_text" name="resume_text" rows="4"
                             placeholder="Paste your resume text, work experiences, technical skills, or education here..."
                             class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono"></textarea>
+                    </div>
+
+                    
+                    <!-- OR Resume Upload -->
+                    <div class="text-center text-sm font-bold text-slate-500 my-2">OR</div>
+                    <div>
+                        <label for="resume_file" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                            Upload Resume (PDF, DOCX, TXT)
+                        </label>
+                        <input type="file" id="resume_file" name="resume_file" accept=".pdf,.docx,.txt"
+                            class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-300 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-500/20 file:text-purple-300 hover:file:bg-purple-500/30">
                     </div>
 
                     <!-- Quick Sample Text Button -->
@@ -174,11 +249,33 @@ async def onboard_form():
 
 @app.post("/onboard")
 async def handle_onboard_form(
-    resume_text: str = Form(...),
     target_role: str = Form(...),
+    resume_text: str = Form(""),
+    resume_file: UploadFile = File(None)
 ):
     """Process onboarding form submission and redirect to gap diagnostics."""
-    learner_id = onboard_learner(resume_text=resume_text, target_role=target_role)
+    final_text = resume_text
+    
+    if resume_file and resume_file.filename:
+        # Save file to temp location
+        fd, temp_path = tempfile.mkstemp(suffix=os.path.splitext(resume_file.filename)[1])
+        with open(temp_path, "wb") as f:
+            f.write(await resume_file.read())
+        os.close(fd)
+        
+        # Extract text using our existing doc_reader
+        extracted = extract_text_from_file(temp_path)
+        if extracted:
+            final_text = extracted
+        
+        # Cleanup
+        os.remove(temp_path)
+        
+    if not final_text.strip():
+        # Re-render with error (simplified for demo, we'll just redirect to onboard)
+        return RedirectResponse(url="/onboard", status_code=status.HTTP_303_SEE_OTHER)
+
+    learner_id = onboard_learner(resume_text=final_text, target_role=target_role)
     return RedirectResponse(url=f"/gaps/{learner_id}", status_code=status.HTTP_303_SEE_OTHER)
 
 
