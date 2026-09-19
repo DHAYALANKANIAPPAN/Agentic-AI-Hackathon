@@ -32,6 +32,27 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+from fastapi.staticfiles import StaticFiles
+from fastapi import Request
+from fastapi.responses import HTMLResponse
+import traceback
+
+app.mount('/static', StaticFiles(directory='static'), name='static')
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    error_trace = traceback.format_exc()
+    html_content = f'''
+    <html>
+    <body>
+        <h2>Internal Server Error</h2>
+        <pre>{error_trace}</pre>
+    </body>
+    </html>
+    '''
+    return HTMLResponse(content=html_content, status_code=500)
+
+
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
