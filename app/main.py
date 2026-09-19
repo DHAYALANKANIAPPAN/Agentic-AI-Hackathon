@@ -15,7 +15,8 @@ import os
 from ai.doc_reader import extract_text_from_file
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from app.repository import init_db, get_learner
-from app.services import onboard_learner
+from app.services import onboard_learner, generate_learner_plan
+from app.repository import save_learner
 
 
 @asynccontextmanager
@@ -207,14 +208,30 @@ async def onboard_form():
                     </div>
 
                     
-                    <!-- OR Resume Upload -->
+                    <!-- OR File Uploads -->
                     <div class="text-center text-sm font-bold text-slate-500 my-2">OR</div>
-                    <div>
-                        <label for="resume_file" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-                            Upload Resume, Certificates & Portfolio (PDF, DOCX, TXT)
-                        </label>
-                        <input type="file" id="resume_files" name="resume_files" accept=".pdf,.docx,.txt" multiple
-                            class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-300 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-500/20 file:text-purple-300 hover:file:bg-purple-500/30">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                                1. Upload Resume (PDF, DOCX, TXT)
+                            </label>
+                            <input type="file" name="resume_file" accept=".pdf,.docx,.txt"
+                                class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-300 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-500/20 file:text-purple-300 hover:file:bg-purple-500/30">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                                2. Upload Certificate (Optional)
+                            </label>
+                            <input type="file" name="cert_file" accept=".pdf,.docx,.txt"
+                                class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-300 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-cyan-500/20 file:text-cyan-300 hover:file:bg-cyan-500/30">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                                3. Upload Portfolio (Optional)
+                            </label>
+                            <input type="file" name="portfolio_file" accept=".pdf,.docx,.txt"
+                                class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-300 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-pink-500/20 file:text-pink-300 hover:file:bg-pink-500/30">
+                        </div>
                     </div>
 
                     <!-- Quick Sample Text Button -->
@@ -263,23 +280,25 @@ async def onboard_form():
 async def handle_onboard_form(
     target_role: str = Form(...),
     resume_text: str = Form(""),
-    resume_files: List[UploadFile] = File([])
+    resume_file: UploadFile = File(None),
+    cert_file: UploadFile = File(None),
+    portfolio_file: UploadFile = File(None)
 ):
     """Process onboarding form submission and redirect to gap diagnostics."""
     extracted_texts = []
     if resume_text.strip():
         extracted_texts.append(resume_text.strip())
 
-    for rf in resume_files:
-        if rf and rf.filename:
-            fd, temp_path = tempfile.mkstemp(suffix=os.path.splitext(rf.filename)[1])
+    for label, f_obj in [("Resume", resume_file), ("Certificate", cert_file), ("Portfolio", portfolio_file)]:
+        if f_obj and f_obj.filename:
+            fd, temp_path = tempfile.mkstemp(suffix=os.path.splitext(f_obj.filename)[1])
             with open(temp_path, "wb") as f:
-                f.write(await rf.read())
+                f.write(await f_obj.read())
             os.close(fd)
             
             ext_text = extract_text_from_file(temp_path)
             if ext_text:
-                extracted_texts.append(f"--- Document: {rf.filename} ---\n" + ext_text)
+                extracted_texts.append(f"--- {label}: {f_obj.filename} ---\n" + ext_text)
                 
             os.remove(temp_path)
             
@@ -1907,3 +1926,38 @@ async def api_get_learner_report(learner_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to generate report: {str(e)}")
 
+
+@app.post("/dashboard/upload/{learner_id}")
+async def upload_certificate_replan(learner_id: str, cert_file: UploadFile = File(...)):
+    """Handles new certificate uploads to dynamically replan the curriculum."""
+    learner = get_learner(learner_id)
+    if not learner:
+        raise HTTPException(status_code=404, detail="Learner not found")
+        
+    if cert_file and cert_file.filename:
+        fd, temp_path = tempfile.mkstemp(suffix=os.path.splitext(cert_file.filename)[1])
+        with open(temp_path, "wb") as f:
+            f.write(await cert_file.read())
+        os.close(fd)
+        
+        ext_text = extract_text_from_file(temp_path)
+        os.remove(temp_path)
+        
+        if ext_text:
+            # Tell the AI to analyze this new certificate and adjust the gaps!
+            from ai.core import analyze_skill_gaps, _cache_analyze
+            
+            # Combine the old gaps text with the new certificate
+            combined_context = f"Learner's previous profile summary: They had gaps in {learner.gaps.target_role}.\nNEW CERTIFICATE EARNED:\n{ext_text}\n\nPlease remove any gaps they have now mastered."
+            
+            # Clear the old cache so it generates fresh
+            _cache_analyze.clear()
+            
+            new_gaps = analyze_skill_gaps(combined_context, learner.gaps.target_role)
+            learner.gaps = new_gaps
+            save_learner(learner)
+            
+            # Now replan the curriculum based on the reduced gaps
+            generate_learner_plan(learner_id)
+            
+    return RedirectResponse(url=f"/dashboard/{learner_id}", status_code=status.HTTP_303_SEE_OTHER)
