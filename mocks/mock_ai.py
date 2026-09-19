@@ -16,7 +16,7 @@ def analyze_profile(form_text: str, document_texts: List[str]) -> SkillProfile:
         ]
     )
 
-def find_gaps(profile: SkillProfile, target_role: str) -> GapList:
+def find_gaps(profile_text: str = '', target_role: str = '', profile=None, **kwargs) -> GapList:
     return GapList(
         target_role=target_role,
         gaps=[
