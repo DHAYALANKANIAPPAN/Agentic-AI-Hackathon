@@ -15,9 +15,9 @@ from mocks import mock_ai
 # True uses the real AI from `ai/core.py`
 # False uses the mock AI from `mocks/mock_ai.py`
 
-USE_REAL_EXTRACT_TEXT = False
-USE_REAL_ANALYZE_PROFILE = False
-USE_REAL_FIND_GAPS = False
+USE_REAL_EXTRACT_TEXT = True
+USE_REAL_ANALYZE_PROFILE = True
+USE_REAL_FIND_GAPS = True
 USE_REAL_RECOMMEND_RESOURCES = False
 USE_REAL_GENERATE_PLAN = False
 USE_REAL_REPLAN = False
