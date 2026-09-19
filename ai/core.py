@@ -139,8 +139,9 @@ def generate_plan(gaps: GapList, hours_per_week: float, weeks_available: int) ->
     Allocate the objectives across the {weeks_available} weeks.
     For each week (week_number 1 to {weeks_available}), provide a 'goal_sentence' and a list of 'items'.
     CRITICAL REQUIREMENTS:
-    1. LIMIT to exactly 2 items total per week to be concise. DO NOT generate week 2, week 3, or anything beyond week 1. Stop immediately after week 1.
+    1. LIMIT to exactly 2 items total per week to be concise.
     2. Every week MUST include at least one practice task or project (set item_type strictly to "practice" or "project").
+    3. TO SAVE SPACE: OMIT the fields "objective_ref", "skill_ref", "status", "minutes_spent", "rating", "quiz_score", and "resources" from the items completely. ONLY output "id", "item_type", and "description".
     2. For URLs, NEVER invent links. Only provide safe search links. Example: https://www.youtube.com/results?search_query=Topic
     Assign a UUID for each item's id field.
 
@@ -166,10 +167,21 @@ def generate_plan(gaps: GapList, hours_per_week: float, weeks_available: int) ->
         import logging
         logging.getLogger(__name__).warning(f"Failed to generate plan: {e}")
         # Fallback empty plan
+        import uuid
+        from shared.schemas.models import PlanItem
         return WeeklyPlan(
             version=1,
             goal_sentences={1: "Begin working on your primary gaps."},
-            weeks={1: []}
+            weeks={1: [
+                PlanItem(
+                    id=str(uuid.uuid4()),
+                    item_type="practice",
+                    description="Spend time reviewing core concepts and practicing your fundamentals.",
+                    resources=[],
+                    status="todo",
+                    minutes_spent=0
+                )
+            ]}
         )
 
 def replan(state: LearnerState) -> WeeklyPlan:
