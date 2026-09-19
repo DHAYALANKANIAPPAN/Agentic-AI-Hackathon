@@ -1,0 +1,52 @@
+{
+  "id": "user_123",
+  "profile": {
+    "skills": [
+      {
+        "name": "Python",
+        "level": "intermediate",
+        "evidence": "2 years of experience building REST APIs"
+      }
+    ]
+  },
+  "gaps": {
+    "target_role": "Data Scientist",
+    "gaps": [
+      {
+        "required_skill": "Machine Learning",
+        "status": "missing",
+        "priority": 1,
+        "objectives": [
+          {
+            "description": "Understand linear regression",
+            "hours_estimated": 5.0
+          }
+        ]
+      }
+    ]
+  },
+  "plan": {
+    "version": 1,
+    "change_reasons": [],
+    "goal_sentences": {
+      "1": "Get started with Machine Learning"
+    },
+    "weeks": {
+      "1": [
+        {
+          "id": "item_1",
+          "objective_ref": "Understand linear regression",
+          "item_type": "learning",
+          "description": "Watch intro video",
+          "resources": [],
+          "status": "todo",
+          "minutes_spent": 0
+        }
+      ]
+    }
+  },
+  "activity_log": [],
+  "struggle_flags": [],
+  "hours_per_week": 10.0,
+  "weeks_available": 12
+}

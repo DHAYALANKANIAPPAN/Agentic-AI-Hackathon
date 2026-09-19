@@ -1,0 +1,16 @@
+Jane Doe
+Software Engineer
+
+Experience:
+- Worked on building REST APIs using Python and Flask.
+- 2 years of experience with SQL databases, particularly PostgreSQL.
+- Basic understanding of frontend technologies like HTML, CSS, and basic JavaScript.
+
+Education:
+- B.S. in Computer Science
+
+Skills:
+- Python
+- SQL
+- Git
+- REST APIs
