@@ -1945,15 +1945,12 @@ async def upload_certificate_replan(learner_id: str, cert_file: UploadFile = Fil
         
         if ext_text:
             # Tell the AI to analyze this new certificate and adjust the gaps!
-            from ai.core import analyze_skill_gaps, _cache_analyze
+            from ai.core import find_gaps, _cache_gaps
             
-            # Combine the old gaps text with the new certificate
             combined_context = f"Learner's previous profile summary: They had gaps in {learner.gaps.target_role}.\nNEW CERTIFICATE EARNED:\n{ext_text}\n\nPlease remove any gaps they have now mastered."
+            _cache_gaps.clear()
             
-            # Clear the old cache so it generates fresh
-            _cache_analyze.clear()
-            
-            new_gaps = analyze_skill_gaps(combined_context, learner.gaps.target_role)
+            new_gaps = find_gaps(profile_text=combined_context, target_role=learner.gaps.target_role)
             learner.gaps = new_gaps
             save_learner(learner)
             

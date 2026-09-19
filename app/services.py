@@ -56,10 +56,11 @@ def onboard_learner(
     4. Return unique learner_id.
     """
     # 1. Analyze profile from resume text
-    profile = analyze_profile(form_text=resume_text, document_texts=[resume_text])
+    # analyze_profile skipped to save 45s
+    profile = None
 
     # 2. Find skill gaps against target role
-    gaps = find_gaps(profile=profile, target_role=target_role)
+    gaps = find_gaps(profile_text=resume_text, target_role=target_role)
 
     # 3. Create unique learner state
     learner_id = f"learner-{uuid.uuid4().hex[:8]}"
