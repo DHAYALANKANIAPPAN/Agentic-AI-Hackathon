@@ -94,7 +94,41 @@ async def root():
                 </div>
             </div>
         </main>
-    </body>
+    
+<script>
+    document.addEventListener('DOMContentLoaded', () => {{
+        const overlay = document.createElement('div');
+        overlay.id = 'globalLoadingOverlay';
+        overlay.className = 'fixed inset-0 z-[9999] hidden bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center';
+        overlay.innerHTML = `
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-500 mb-4"></div>
+            <h2 class="text-2xl font-bold text-white mb-2">Loading...</h2>
+            <p class="text-slate-400">Please wait, taking only minimum time!</p>
+        `;
+        document.body.appendChild(overlay);
+
+        function showLoading() {{
+            document.getElementById('globalLoadingOverlay').classList.remove('hidden');
+        }}
+
+        document.querySelectorAll('a').forEach(link => {{
+            link.addEventListener('click', (e) => {{
+                const href = link.getAttribute('href');
+                if (href && !href.startsWith('#') && link.getAttribute('target') !== '_blank') {{
+                    showLoading();
+                }}
+            }});
+        }});
+
+        document.querySelectorAll('form').forEach(form => {{
+            form.addEventListener('submit', () => {{
+                showLoading();
+            }});
+        }});
+    }});
+</script>
+</body>
+
     </html>
     """
     return HTMLResponse(content=html_content)
@@ -271,7 +305,41 @@ async def onboard_form():
                 document.body.appendChild(overlay);
             }
         </script>
-    </body>
+    
+<script>
+    document.addEventListener('DOMContentLoaded', () => {{
+        const overlay = document.createElement('div');
+        overlay.id = 'globalLoadingOverlay';
+        overlay.className = 'fixed inset-0 z-[9999] hidden bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center';
+        overlay.innerHTML = `
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-500 mb-4"></div>
+            <h2 class="text-2xl font-bold text-white mb-2">Loading...</h2>
+            <p class="text-slate-400">Please wait, taking only minimum time!</p>
+        `;
+        document.body.appendChild(overlay);
+
+        function showLoading() {{
+            document.getElementById('globalLoadingOverlay').classList.remove('hidden');
+        }}
+
+        document.querySelectorAll('a').forEach(link => {{
+            link.addEventListener('click', (e) => {{
+                const href = link.getAttribute('href');
+                if (href && !href.startsWith('#') && link.getAttribute('target') !== '_blank') {{
+                    showLoading();
+                }}
+            }});
+        }});
+
+        document.querySelectorAll('form').forEach(form => {{
+            form.addEventListener('submit', () => {{
+                showLoading();
+            }});
+        }});
+    }});
+</script>
+</body>
+
     </html>
     """
     return HTMLResponse(content=html_content)
@@ -310,8 +378,11 @@ async def handle_onboard_form(
         # Re-render with error (simplified for demo, we'll just redirect to onboard)
         return RedirectResponse(url="/onboard", status_code=status.HTTP_303_SEE_OTHER)
 
-    cookie_learner_id = request.cookies.get("learner_id")
-    learner_id = onboard_learner(resume_text=final_text, target_role=target_role, learner_id=cookie_learner_id)
+    username = request.cookies.get("username")
+    learner_id = onboard_learner(resume_text=final_text, target_role=target_role)
+    if username:
+        from app.auth import add_user_role
+        add_user_role(username, target_role, learner_id)
     return RedirectResponse(url=f"/gaps/{learner_id}", status_code=status.HTTP_303_SEE_OTHER)
 
 
@@ -525,7 +596,41 @@ async def view_gaps(learner_id: str):
                 </div>
             </div>
         </main>
-    </body>
+    
+<script>
+    document.addEventListener('DOMContentLoaded', () => {{
+        const overlay = document.createElement('div');
+        overlay.id = 'globalLoadingOverlay';
+        overlay.className = 'fixed inset-0 z-[9999] hidden bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center';
+        overlay.innerHTML = `
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-500 mb-4"></div>
+            <h2 class="text-2xl font-bold text-white mb-2">Loading...</h2>
+            <p class="text-slate-400">Please wait, taking only minimum time!</p>
+        `;
+        document.body.appendChild(overlay);
+
+        function showLoading() {{
+            document.getElementById('globalLoadingOverlay').classList.remove('hidden');
+        }}
+
+        document.querySelectorAll('a').forEach(link => {{
+            link.addEventListener('click', (e) => {{
+                const href = link.getAttribute('href');
+                if (href && !href.startsWith('#') && link.getAttribute('target') !== '_blank') {{
+                    showLoading();
+                }}
+            }});
+        }});
+
+        document.querySelectorAll('form').forEach(form => {{
+            form.addEventListener('submit', () => {{
+                showLoading();
+            }});
+        }});
+    }});
+</script>
+</body>
+
     </html>
     """
     return HTMLResponse(content=html_content)
@@ -845,7 +950,41 @@ async def view_weekly_plan(learner_id: str, week: int = 1, replanned: Optional[i
                 {items_html or "<p class='text-xs text-slate-400 italic p-6 text-center'>No items scheduled for this week.</p>"}
             </div>
         </main>
-    </body>
+    
+<script>
+    document.addEventListener('DOMContentLoaded', () => {{
+        const overlay = document.createElement('div');
+        overlay.id = 'globalLoadingOverlay';
+        overlay.className = 'fixed inset-0 z-[9999] hidden bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center';
+        overlay.innerHTML = `
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-500 mb-4"></div>
+            <h2 class="text-2xl font-bold text-white mb-2">Loading...</h2>
+            <p class="text-slate-400">Please wait, taking only minimum time!</p>
+        `;
+        document.body.appendChild(overlay);
+
+        function showLoading() {{
+            document.getElementById('globalLoadingOverlay').classList.remove('hidden');
+        }}
+
+        document.querySelectorAll('a').forEach(link => {{
+            link.addEventListener('click', (e) => {{
+                const href = link.getAttribute('href');
+                if (href && !href.startsWith('#') && link.getAttribute('target') !== '_blank') {{
+                    showLoading();
+                }}
+            }});
+        }});
+
+        document.querySelectorAll('form').forEach(form => {{
+            form.addEventListener('submit', () => {{
+                showLoading();
+            }});
+        }});
+    }});
+</script>
+</body>
+
     </html>
     """
     return HTMLResponse(content=html_content)
@@ -1055,7 +1194,41 @@ async def view_dashboard(learner_id: str):
                 </div>
             </div>
         </main>
-    </body>
+    
+<script>
+    document.addEventListener('DOMContentLoaded', () => {{
+        const overlay = document.createElement('div');
+        overlay.id = 'globalLoadingOverlay';
+        overlay.className = 'fixed inset-0 z-[9999] hidden bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center';
+        overlay.innerHTML = `
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-500 mb-4"></div>
+            <h2 class="text-2xl font-bold text-white mb-2">Loading...</h2>
+            <p class="text-slate-400">Please wait, taking only minimum time!</p>
+        `;
+        document.body.appendChild(overlay);
+
+        function showLoading() {{
+            document.getElementById('globalLoadingOverlay').classList.remove('hidden');
+        }}
+
+        document.querySelectorAll('a').forEach(link => {{
+            link.addEventListener('click', (e) => {{
+                const href = link.getAttribute('href');
+                if (href && !href.startsWith('#') && link.getAttribute('target') !== '_blank') {{
+                    showLoading();
+                }}
+            }});
+        }});
+
+        document.querySelectorAll('form').forEach(form => {{
+            form.addEventListener('submit', () => {{
+                showLoading();
+            }});
+        }});
+    }});
+</script>
+</body>
+
     </html>
     """
     return HTMLResponse(content=html_content)
@@ -1333,7 +1506,41 @@ async def view_chat(learner_id: str):
                 }}
             }});
         </script>
-    </body>
+    
+<script>
+    document.addEventListener('DOMContentLoaded', () => {{
+        const overlay = document.createElement('div');
+        overlay.id = 'globalLoadingOverlay';
+        overlay.className = 'fixed inset-0 z-[9999] hidden bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center';
+        overlay.innerHTML = `
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-500 mb-4"></div>
+            <h2 class="text-2xl font-bold text-white mb-2">Loading...</h2>
+            <p class="text-slate-400">Please wait, taking only minimum time!</p>
+        `;
+        document.body.appendChild(overlay);
+
+        function showLoading() {{
+            document.getElementById('globalLoadingOverlay').classList.remove('hidden');
+        }}
+
+        document.querySelectorAll('a').forEach(link => {{
+            link.addEventListener('click', (e) => {{
+                const href = link.getAttribute('href');
+                if (href && !href.startsWith('#') && link.getAttribute('target') !== '_blank') {{
+                    showLoading();
+                }}
+            }});
+        }});
+
+        document.querySelectorAll('form').forEach(form => {{
+            form.addEventListener('submit', () => {{
+                showLoading();
+            }});
+        }});
+    }});
+</script>
+</body>
+
     </html>
     """
     return HTMLResponse(content=html_content)
@@ -1910,7 +2117,41 @@ async def view_progress_report(learner_id: str):
         <footer class="mt-auto border-t border-slate-900 py-6 text-center text-xs text-slate-500 no-print">
             <p>EduPath Agentic AI Hackathon &bull; Phase 4 Evaluation Report &bull; Powered by FastAPI & Agentic AI</p>
         </footer>
-    </body>
+    
+<script>
+    document.addEventListener('DOMContentLoaded', () => {{
+        const overlay = document.createElement('div');
+        overlay.id = 'globalLoadingOverlay';
+        overlay.className = 'fixed inset-0 z-[9999] hidden bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center';
+        overlay.innerHTML = `
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-500 mb-4"></div>
+            <h2 class="text-2xl font-bold text-white mb-2">Loading...</h2>
+            <p class="text-slate-400">Please wait, taking only minimum time!</p>
+        `;
+        document.body.appendChild(overlay);
+
+        function showLoading() {{
+            document.getElementById('globalLoadingOverlay').classList.remove('hidden');
+        }}
+
+        document.querySelectorAll('a').forEach(link => {{
+            link.addEventListener('click', (e) => {{
+                const href = link.getAttribute('href');
+                if (href && !href.startsWith('#') && link.getAttribute('target') !== '_blank') {{
+                    showLoading();
+                }}
+            }});
+        }});
+
+        document.querySelectorAll('form').forEach(form => {{
+            form.addEventListener('submit', () => {{
+                showLoading();
+            }});
+        }});
+    }});
+</script>
+</body>
+
     </html>
     """
     return HTMLResponse(content=html_content)
@@ -1985,7 +2226,7 @@ async def login_page():
             <div class="absolute -top-32 -right-32 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl"></div>
             
             <div class="text-center mb-8 relative z-10">
-                <div class="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center mx-auto mb-4 text-white font-bold text-xl shadow-lg shadow-indigo-500/30">E</div>
+                <img src="/static/logo.png" class="w-12 h-12 rounded-xl object-cover shadow-lg mx-auto mb-4">
                 <h1 class="text-2xl font-bold text-white font-heading">Welcome to EduPath</h1>
                 <p class="text-slate-400 mt-2 text-sm">Sign in or create an account to continue your learning journey.</p>
             </div>
@@ -2010,7 +2251,41 @@ async def login_page():
                 </div>
             </form>
         </div>
-    </body>
+    
+<script>
+    document.addEventListener('DOMContentLoaded', () => {{
+        const overlay = document.createElement('div');
+        overlay.id = 'globalLoadingOverlay';
+        overlay.className = 'fixed inset-0 z-[9999] hidden bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center';
+        overlay.innerHTML = `
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-500 mb-4"></div>
+            <h2 class="text-2xl font-bold text-white mb-2">Loading...</h2>
+            <p class="text-slate-400">Please wait, taking only minimum time!</p>
+        `;
+        document.body.appendChild(overlay);
+
+        function showLoading() {{
+            document.getElementById('globalLoadingOverlay').classList.remove('hidden');
+        }}
+
+        document.querySelectorAll('a').forEach(link => {{
+            link.addEventListener('click', (e) => {{
+                const href = link.getAttribute('href');
+                if (href && !href.startsWith('#') && link.getAttribute('target') !== '_blank') {{
+                    showLoading();
+                }}
+            }});
+        }});
+
+        document.querySelectorAll('form').forEach(form => {{
+            form.addEventListener('submit', () => {{
+                showLoading();
+            }});
+        }});
+    }});
+</script>
+</body>
+
     </html>
     '''
     return HTMLResponse(content=html_content)
@@ -2023,36 +2298,114 @@ async def handle_auth(
 ):
     from app.auth import authenticate_user, register_user
     if action == "signup":
-        learner_id = register_user(username, password)
-        if not learner_id:
+        success = register_user(username, password)
+        if not success:
             return HTMLResponse("Username already exists. <a href='/login'>Go back</a>", status_code=400)
-        
-        # User just signed up, needs onboarding
-        redirect_resp = RedirectResponse(url="/onboard", status_code=status.HTTP_303_SEE_OTHER)
-        redirect_resp.set_cookie(key="learner_id", value=learner_id)
+        redirect_resp = RedirectResponse(url="/profile", status_code=status.HTTP_303_SEE_OTHER)
+        redirect_resp.set_cookie(key="username", value=username)
         return redirect_resp
         
     elif action == "login":
-        learner_id = authenticate_user(username, password)
-        if not learner_id:
+        success = authenticate_user(username, password)
+        if not success:
             return HTMLResponse("Invalid credentials. <a href='/login'>Go back</a>", status_code=400)
             
-        from app.repository import get_learner
-        learner = get_learner(learner_id)
-        
-        # If they haven't finished onboard (no profile), send them to onboard.
-        # Otherwise, directly to their dashboard!
-        if learner and learner.profile:
-            redirect_resp = RedirectResponse(url=f"/dashboard/{learner_id}", status_code=status.HTTP_303_SEE_OTHER)
-        else:
-            redirect_resp = RedirectResponse(url="/onboard", status_code=status.HTTP_303_SEE_OTHER)
-            
-        redirect_resp.set_cookie(key="learner_id", value=learner_id)
+        redirect_resp = RedirectResponse(url="/profile", status_code=status.HTTP_303_SEE_OTHER)
+        redirect_resp.set_cookie(key="username", value=username)
         return redirect_resp
 
 @app.get("/logout")
 async def logout():
     redirect_resp = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-    redirect_resp.delete_cookie("learner_id")
+    redirect_resp.delete_cookie("username")
     return redirect_resp
+
+@app.get("/profile", response_class=HTMLResponse)
+async def profile_page(request: Request):
+    username = request.cookies.get("username")
+    if not username:
+        return RedirectResponse(url="/login")
+    
+    from app.auth import get_user_roles
+    roles = get_user_roles(username)
+    
+    roles_html = ""
+    for role in roles:
+        roles_html += f'''
+        <a href="/dashboard/{role['learner_id']}" class="block p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-800 transition-colors">
+            <h3 class="text-lg font-bold text-white">{role['target_role']}</h3>
+            <p class="text-sm text-slate-400">View progress dashboard →</p>
+        </a>
+        '''
+        
+    if not roles:
+        roles_html = "<p class='text-slate-400'>You haven't added any roles yet.</p>"
+        
+    html_content = f'''
+    <!DOCTYPE html>
+    <html lang="en" class="h-full bg-slate-950 text-slate-100">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>My Profile | EduPath</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    </head>
+    <body class="min-h-full flex items-center justify-center font-sans antialiased bg-slate-950 p-4">
+        <div class="rounded-2xl border border-slate-800 p-8 w-full max-w-lg shadow-2xl relative overflow-hidden bg-slate-900/80 backdrop-blur-lg">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center gap-3">
+                    <img src="/static/logo.png" class="w-12 h-12 rounded-xl object-cover shadow-lg">
+                    <h1 class="text-2xl font-bold text-white font-heading">My Roles</h1>
+                </div>
+                <a href="/logout" class="px-4 py-2 text-sm text-rose-400 bg-rose-400/10 hover:bg-rose-400/20 rounded-lg transition-colors">Logout</a>
+            </div>
+            
+            <div class="space-y-4 mb-8">
+                {roles_html}
+            </div>
+            
+            <a href="/onboard" class="w-full block text-center py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold rounded-lg shadow-lg transition-all">
+                + Add New Role
+            </a>
+        </div>
+    
+<script>
+    document.addEventListener('DOMContentLoaded', () => {{
+        const overlay = document.createElement('div');
+        overlay.id = 'globalLoadingOverlay';
+        overlay.className = 'fixed inset-0 z-[9999] hidden bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center';
+        overlay.innerHTML = `
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-500 mb-4"></div>
+            <h2 class="text-2xl font-bold text-white mb-2">Loading...</h2>
+            <p class="text-slate-400">Please wait, taking only minimum time!</p>
+        `;
+        document.body.appendChild(overlay);
+
+        function showLoading() {{
+            document.getElementById('globalLoadingOverlay').classList.remove('hidden');
+        }}
+
+        document.querySelectorAll('a').forEach(link => {{
+            link.addEventListener('click', (e) => {{
+                const href = link.getAttribute('href');
+                if (href && !href.startsWith('#') && link.getAttribute('target') !== '_blank') {{
+                    showLoading();
+                }}
+            }});
+        }});
+
+        document.querySelectorAll('form').forEach(form => {{
+            form.addEventListener('submit', () => {{
+                showLoading();
+            }});
+        }});
+    }});
+</script>
+</body>
+
+    </html>
+    '''
+    return HTMLResponse(content=html_content)
+
 
