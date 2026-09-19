@@ -63,6 +63,7 @@ def generate_json(prompt: str, response_schema: Type[T], model_name: str = "meta
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.2,
+                max_tokens=4000,
                 response_format={"type": "json_object"}
             )
             
