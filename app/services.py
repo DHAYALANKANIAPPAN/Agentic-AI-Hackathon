@@ -46,6 +46,7 @@ from shared.schemas.models import (
 def onboard_learner(
     resume_text: str,
     target_role: str,
+    learner_id: str = None,
     db_path: str = "edupath.db",
 ) -> str:
     """Execute learner intake:

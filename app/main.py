@@ -9,7 +9,7 @@ Serves:
 
 from contextlib import asynccontextmanager
 from typing import Optional, List
-from fastapi import FastAPI, Form, File, UploadFile, HTTPException, Request, status
+from fastapi import Response, FastAPI, Form, File, UploadFile, HTTPException, Request, status
 import tempfile
 import os
 from ai.doc_reader import extract_text_from_file
@@ -70,7 +70,7 @@ async def root():
                     EduPath is an autonomous agentic platform that analyzes your current skills, identifies the gaps to your dream career, and generates a dynamic weekly curriculum that adapts to your progress.
                 </p>
                 <div class="flex flex-col sm:flex-row justify-center gap-4 pt-4">
-                    <a href="/onboard" class="px-8 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 shadow-lg shadow-purple-600/30 transition-all text-lg">
+                    <a href="/login" class="px-8 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 shadow-lg shadow-purple-600/30 transition-all text-lg">
                         Get Started
                     </a>
                     <a href="/demo/seed" class="px-8 py-3 rounded-xl font-bold text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all text-lg">
@@ -141,7 +141,7 @@ async def onboard_form():
         <!-- Navigation -->
         <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur sticky top-0 z-20">
             <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-                <a href="/onboard" class="flex items-center gap-2.5">
+                <a href="/login" class="flex items-center gap-2.5">
                     <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-400 flex items-center justify-center font-heading font-extrabold text-white text-lg shadow-lg">
                         E
                     </div>
@@ -261,13 +261,14 @@ async def onboard_form():
             }
 
             function showLoading() {
-                const btn = document.getElementById('submit-btn');
-                const btnText = document.getElementById('btn-text');
-                const btnIcon = document.getElementById('btn-icon');
-                btn.disabled = true;
-                btn.classList.add('opacity-80', 'cursor-not-allowed');
-                btnText.innerText = "Analyzing with AI Agent...";
-                btnIcon.classList.add('animate-spin');
+                const overlay = document.createElement('div');
+                overlay.className = 'fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center';
+                overlay.innerHTML = `
+                    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-500 mb-4"></div>
+                    <h2 class="text-2xl font-bold gradient-text mb-2 text-white">Analyzing your Profile...</h2>
+                    <p class="text-slate-400">Please wait, taking only minimum time!</p>
+                `;
+                document.body.appendChild(overlay);
             }
         </script>
     </body>
@@ -278,6 +279,7 @@ async def onboard_form():
 
 @app.post("/onboard")
 async def handle_onboard_form(
+    request: Request,
     target_role: str = Form(...),
     resume_text: str = Form(""),
     resume_file: UploadFile = File(None),
@@ -308,7 +310,8 @@ async def handle_onboard_form(
         # Re-render with error (simplified for demo, we'll just redirect to onboard)
         return RedirectResponse(url="/onboard", status_code=status.HTTP_303_SEE_OTHER)
 
-    learner_id = onboard_learner(resume_text=final_text, target_role=target_role)
+    cookie_learner_id = request.cookies.get("learner_id")
+    learner_id = onboard_learner(resume_text=final_text, target_role=target_role, learner_id=cookie_learner_id)
     return RedirectResponse(url=f"/gaps/{learner_id}", status_code=status.HTTP_303_SEE_OTHER)
 
 
@@ -410,7 +413,7 @@ async def view_gaps(learner_id: str):
         <!-- Navigation -->
         <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur sticky top-0 z-20">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-                <a href="/onboard" class="flex items-center gap-2.5">
+                <a href="/login" class="flex items-center gap-2.5">
                     <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-400 flex items-center justify-center font-heading font-extrabold text-white text-lg shadow-lg">
                         E
                     </div>
@@ -432,7 +435,7 @@ async def view_gaps(learner_id: str):
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
                         <span>AI Tutor</span>
                     </a>
-                    <a href="/onboard" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-purple-900/40 hover:bg-purple-900/60 text-purple-300 border border-purple-800/50 transition-all">
+                    <a href="/login" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-purple-900/40 hover:bg-purple-900/60 text-purple-300 border border-purple-800/50 transition-all">
                         &larr; New Intake
                     </a>
                 </div>
@@ -751,7 +754,7 @@ async def view_weekly_plan(learner_id: str, week: int = 1, replanned: Optional[i
         <!-- Navigation -->
         <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur sticky top-0 z-20">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-                <a href="/onboard" class="flex items-center gap-2.5">
+                <a href="/login" class="flex items-center gap-2.5">
                     <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-400 flex items-center justify-center font-heading font-extrabold text-white text-lg shadow-lg">
                         E
                     </div>
@@ -773,7 +776,7 @@ async def view_weekly_plan(learner_id: str, week: int = 1, replanned: Optional[i
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
                         <span>AI Tutor Chat</span>
                     </a>
-                    <a href="/onboard" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-purple-900/40 hover:bg-purple-900/60 text-purple-300 border border-purple-800/50 transition-all">
+                    <a href="/login" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-purple-900/40 hover:bg-purple-900/60 text-purple-300 border border-purple-800/50 transition-all">
                         + New Intake
                     </a>
                 </div>
@@ -976,7 +979,7 @@ async def view_dashboard(learner_id: str):
         <!-- Navigation -->
         <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur sticky top-0 z-20">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-                <a href="/onboard" class="flex items-center gap-2.5">
+                <a href="/login" class="flex items-center gap-2.5">
                     <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-400 flex items-center justify-center font-bold text-white text-lg">E</div>
                     <span class="font-bold text-xl text-white">EduPath <span class="text-xs uppercase px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300">Dashboard</span></span>
                 </a>
@@ -1190,7 +1193,7 @@ async def view_chat(learner_id: str):
         <!-- Navigation -->
         <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur sticky top-0 z-20">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-                <a href="/onboard" class="flex items-center gap-2.5">
+                <a href="/login" class="flex items-center gap-2.5">
                     <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-400 flex items-center justify-center font-heading font-extrabold text-white text-lg shadow-lg">
                         E
                     </div>
@@ -1687,7 +1690,7 @@ async def view_progress_report(learner_id: str):
         <!-- Navigation -->
         <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur sticky top-0 z-20 no-print">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-                <a href="/onboard" class="flex items-center gap-2.5">
+                <a href="/login" class="flex items-center gap-2.5">
                     <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-400 flex items-center justify-center font-heading font-extrabold text-white text-lg shadow-lg">
                         E
                     </div>
