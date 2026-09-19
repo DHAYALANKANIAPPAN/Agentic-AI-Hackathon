@@ -23,9 +23,9 @@ def analyze_profile(form_text: str, document_texts: List[str]) -> SkillProfile:
 
 
 def find_gaps(profile: SkillProfile, target_role: str) -> GapList:
+    """Produces a GapList from a profile and a target role."""
     cache_key = profile.model_dump_json() + target_role
     if cache_key in _cache_gaps: return _cache_gaps[cache_key]
-    """Produces a GapList from a profile and a target role."""
     
     # Fallback lists in case LLM fails
     fallbacks = {
@@ -62,7 +62,7 @@ def find_gaps(profile: SkillProfile, target_role: str) -> GapList:
     
     try:
         gap_list = llm.generate_json(prompt, GapList)
-            _cache_gaps[cache_key] = gap_list
+        _cache_gaps[cache_key] = gap_list
         return gap_list
     except Exception as e:
         # Fallback
@@ -118,15 +118,10 @@ class WeeklyPlanWrapper(BaseModel):
     weeks: List[WeekItemWrapper]
 
 def generate_plan(gaps: GapList, hours_per_week: float, weeks_available: int) -> WeeklyPlan:
+    """Generates a study plan based on identified skill gaps and time constraints."""
     cache_key = gaps.model_dump_json() + str(hours_per_week) + str(weeks_available)
     if cache_key in _cache_plan: return _cache_plan[cache_key]
-    """Generates a study plan based on identified skill gaps and time constraints."""
     import uuid
-
-_cache_analyze = {}
-_cache_gaps = {}
-_cache_plan = {}
-_cache_report = {}
     prompt = f"""
     Create a highly structured {weeks_available}-week study plan for someone transitioning to a "{gaps.target_role}" role.
     They can commit {hours_per_week} hours per week.
@@ -153,7 +148,7 @@ _cache_report = {}
                 if not item.id or len(str(item.id)) < 5:
                     item.id = str(uuid.uuid4())
                     
-            _cache_plan[cache_key] = plan
+        _cache_plan[cache_key] = plan
         return plan
     except Exception as e:
         import logging
@@ -190,7 +185,6 @@ def replan(state: LearnerState) -> WeeklyPlan:
             for item in w.items:
                 if not item.id or len(str(item.id)) < 5:
                     item.id = str(uuid.uuid4())
-            _cache_plan[cache_key] = plan
         return plan
     except Exception as e:
         import logging
@@ -224,20 +218,17 @@ def answer_question(state: LearnerState, chat_history: List[Dict[str, str]], que
 def write_report_narrative(stats: ProgressStats, state: LearnerState) -> str:
     """Writes an encouraging progress report narrative."""
     cache_key = str(stats.items_done) + str(stats.hours_spent) + (state.gaps.target_role if state.gaps else '')
-    if cache_key in _cache_report:
-        return _cache_report[cache_key]
-        
+    if cache_key in _cache_report: return _cache_report[cache_key]
+    
     skills_acq = stats.skills_by_status.get('has', 0)
-    skills_acq_str = f"{skills_acq} skills"
     
     struggles_str = ", ".join([s.topic_id for s in state.struggle_flags]) if state.struggle_flags else "None"
     
     prompt = f"""
     Write a short, encouraging progress report for a student aiming to be a "{state.gaps.target_role if state.gaps else 'Unknown'}".
-    
     - Hours studied: {stats.hours_spent}
     - Items completed: {stats.items_done}
-    - Skills acquired: {skills_acq_str}
+    - Skills acquired: {skills_acq}
     - Struggling areas: {struggles_str}
     
     The report MUST cover:
@@ -253,5 +244,4 @@ def write_report_narrative(stats: ProgressStats, state: LearnerState) -> str:
     except Exception as e:
         import logging
         logging.getLogger(__name__).warning(f"Failed to write report: {e}")
-        return f"Great job! You have completed {stats.items_done} items and studied for {stats.hours_spent} hours. Keep up the fantastic work!"
-
+        return f"Great job! You have completed {stats.items_done} items and studied for {stats.hours_spent} hours."
