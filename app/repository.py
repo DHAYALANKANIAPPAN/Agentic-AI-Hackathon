@@ -77,6 +77,16 @@ def init_db(db_path: str = DEFAULT_DB_PATH) -> None:
                 FOREIGN KEY (learner_id) REFERENCES learners(id)
             );
         """)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS chat_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                learner_id TEXT NOT NULL,
+                role TEXT NOT NULL,
+                message TEXT NOT NULL,
+                timestamp TEXT NOT NULL,
+                FOREIGN KEY (learner_id) REFERENCES learners(id)
+            );
+        """)
         conn.commit()
 
 
@@ -216,4 +226,37 @@ def save_gaps(learner_id: str, gaps: GapList, db_path: str = DEFAULT_DB_PATH) ->
         cursor = conn.cursor()
         gaps_json = gaps.model_dump_json()
         cursor.execute("UPDATE learners SET gaps_json = ? WHERE id = ?;", (gaps_json, learner_id))
+        conn.commit()
+
+
+def save_chat_message(learner_id: str, role: str, message: str, db_path: str = DEFAULT_DB_PATH) -> None:
+    """Save a chat message (user or assistant) to chat_history."""
+    init_db(db_path)
+    with get_db(db_path) as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO chat_history (learner_id, role, message, timestamp)
+            VALUES (?, ?, ?, ?);
+        """, (learner_id, role, message, datetime.utcnow().isoformat()))
+        conn.commit()
+
+
+def get_chat_history(learner_id: str, db_path: str = DEFAULT_DB_PATH) -> List[dict]:
+    """Retrieve chat history for a learner ordered chronologically."""
+    init_db(db_path)
+    with get_db(db_path) as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT role, message FROM chat_history WHERE learner_id = ? ORDER BY id ASC;", (learner_id,))
+        rows = cursor.fetchall()
+        return [{"role": r["role"], "content": r["message"]} for r in rows]
+
+
+def clear_learner_history(learner_id: str, db_path: str = DEFAULT_DB_PATH) -> None:
+    """Clear activity logs, struggle flags, and chat history for a learner."""
+    init_db(db_path)
+    with get_db(db_path) as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM activity_log WHERE learner_id = ?;", (learner_id,))
+        cursor.execute("DELETE FROM struggle_flags WHERE learner_id = ?;", (learner_id,))
+        cursor.execute("DELETE FROM chat_history WHERE learner_id = ?;", (learner_id,))
         conn.commit()

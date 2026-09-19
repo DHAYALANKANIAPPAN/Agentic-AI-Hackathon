@@ -1,10 +1,19 @@
 import json
 import os
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional, List, Tuple, Dict
-from app.provider import analyze_profile, find_gaps, generate_plan
-from app.repository import save_learner, get_learner, log_activity, save_plan
+from app.provider import analyze_profile, find_gaps, generate_plan, replan, answer_question
+from app.repository import (
+    save_learner,
+    get_learner,
+    log_activity,
+    save_plan,
+    save_struggle_flag,
+    save_chat_message,
+    get_chat_history,
+    clear_learner_history,
+)
 from shared.schemas.models import (
     LearnerState,
     WeeklyPlan,
@@ -23,6 +32,7 @@ from shared.schemas.models import (
     ItemType,
     Resource,
     ResourceType,
+    StruggleFlag,
 )
 
 
@@ -383,6 +393,210 @@ def seed_demo_learner(db_path: str = "edupath.db") -> str:
         weeks_available=4,
     )
 
+    clear_learner_history(demo_id, db_path=db_path)
     save_learner(learner, db_path=db_path)
     return demo_id
+
+
+def detect_struggles(state: LearnerState) -> List[StruggleFlag]:
+    """Detect study friction and learning struggles deterministically.
+
+    Rules:
+    1. Same skill rated 'struggled' 2+ times.
+    2. Quiz score below 60% on any completed item.
+    3. Item overdue by more than 7 days with struggle friction.
+    4. Skill items skipped or retried 2+ times.
+    """
+    flags: List[StruggleFlag] = []
+
+    # Map item_id to skill name
+    item_to_skill: Dict[str, str] = {}
+    if state.plan and state.plan.weeks:
+        for week_items in state.plan.weeks.values():
+            for item in week_items:
+                if item.skill_ref:
+                    item_to_skill[item.id] = item.skill_ref
+
+    # 1. Same skill rated "struggled" 2+ times
+    struggle_counts: Dict[str, int] = {}
+    for act in state.activity_log:
+        r_val = act.rating.value if hasattr(act.rating, "value") else str(act.rating).lower()
+        if r_val == "struggled":
+            skill = item_to_skill.get(act.item_id, "Core Skill")
+            struggle_counts[skill] = struggle_counts.get(skill, 0) + 1
+
+    for skill, count in struggle_counts.items():
+        if count >= 2:
+            flags.append(
+                StruggleFlag(
+                    skill_name=skill,
+                    reason="Rated 'struggled' 2+ times across study items",
+                    severity="high",
+                )
+            )
+
+    # 2. Quiz score below 60%
+    for act in state.activity_log:
+        if act.quiz_score is not None and act.quiz_score < 60.0:
+            skill = item_to_skill.get(act.item_id, "Core Skill")
+            flags.append(
+                StruggleFlag(
+                    skill_name=skill,
+                    reason=f"Low quiz score of {act.quiz_score:.1f}% on item {act.item_id} (passing threshold is 60%)",
+                    severity="high",
+                )
+            )
+
+    # 3. Friction older than 7 days
+    now = datetime.utcnow()
+    for act in state.activity_log:
+        age_days = (now - act.timestamp).total_seconds() / 86400.0
+        r_val = act.rating.value if hasattr(act.rating, "value") else str(act.rating).lower()
+        if age_days > 7.0 and r_val == "struggled":
+            skill = item_to_skill.get(act.item_id, "Core Skill")
+            flags.append(
+                StruggleFlag(
+                    skill_name=skill,
+                    reason=f"Study friction unresolved for over 7 days on item {act.item_id}",
+                    severity="medium",
+                )
+            )
+
+    # 4. Skipped or retried 2+ times
+    item_attempts: Dict[str, int] = {}
+    for act in state.activity_log:
+        item_attempts[act.item_id] = item_attempts.get(act.item_id, 0) + 1
+
+    skill_friction_counts: Dict[str, int] = {}
+    for item_id, attempts in item_attempts.items():
+        if attempts >= 2:
+            skill = item_to_skill.get(item_id, "Core Skill")
+            skill_friction_counts[skill] = skill_friction_counts.get(skill, 0) + (attempts - 1)
+
+    if state.plan and state.plan.weeks:
+        for week_items in state.plan.weeks.values():
+            for item in week_items:
+                s_val = item.status.value if hasattr(item.status, "value") else str(item.status).lower()
+                if s_val == "skipped":
+                    skill = item.skill_ref or "Core Skill"
+                    skill_friction_counts[skill] = skill_friction_counts.get(skill, 0) + 1
+
+    for skill, count in skill_friction_counts.items():
+        if count >= 2:
+            flags.append(
+                StruggleFlag(
+                    skill_name=skill,
+                    reason="Items skipped or retried 2+ times without mastery",
+                    severity="medium",
+                )
+            )
+
+    # Deduplicate deterministically
+    unique_flags: List[StruggleFlag] = []
+    seen = set()
+    for f in flags:
+        key = (f.skill_name.strip().lower(), f.reason.strip())
+        if key not in seen:
+            seen.add(key)
+            unique_flags.append(f)
+
+    return unique_flags
+
+
+def process_progress_update(
+    learner_id: str,
+    item_id: str,
+    minutes_spent: int,
+    self_rating: Rating,
+    quiz_score: Optional[float] = None,
+    db_path: str = "edupath.db",
+) -> Tuple[LearnerState, bool]:
+    """Execute adaptive feedback loop:
+
+    1. Mark item done and log activity via complete_item.
+    2. Detect struggles.
+    3. ONLY if a NEW struggle flag appears:
+       - Trigger AI replan.
+       - Increment version and add plain-English change reasons.
+       - Preserve all completed items.
+       - Save updated plan and struggle flags.
+    4. Never replan on 'easy' or 'ok' alone.
+    """
+    # 1. Complete item
+    learner = complete_item(
+        learner_id=learner_id,
+        item_id=item_id,
+        minutes_spent=minutes_spent,
+        self_rating=self_rating,
+        quiz_score=quiz_score,
+        db_path=db_path,
+    )
+    if not learner:
+        raise ValueError(f"Learner {learner_id} not found")
+
+    # 2. Existing flags
+    existing_flag_keys = {(f.skill_name.strip().lower(), f.reason.strip()) for f in learner.struggle_flags}
+
+    # 3. Detect struggles
+    detected_flags = detect_struggles(learner)
+    new_flags = [f for f in detected_flags if (f.skill_name.strip().lower(), f.reason.strip()) not in existing_flag_keys]
+
+    # 4. Adaptive loop: only replan if new struggle flag appeared
+    if new_flags:
+        for f in new_flags:
+            save_struggle_flag(learner_id, f, db_path=db_path)
+            learner.struggle_flags.append(f)
+
+        # Call AI replan
+        new_plan = replan(learner)
+        current_version = learner.plan.version if learner.plan else 1
+        new_plan.version = current_version + 1
+
+        for f in new_flags:
+            reason_msg = f"Adaptive replan: detected struggle ({f.reason}) in {f.skill_name}"
+            if reason_msg not in new_plan.change_reasons:
+                new_plan.change_reasons.append(reason_msg)
+
+        # Preserve already completed items
+        done_items = {}
+        if learner.plan and learner.plan.weeks:
+            for w_items in learner.plan.weeks.values():
+                for itm in w_items:
+                    if itm.status == ItemStatus.DONE:
+                        done_items[itm.id] = itm
+
+        if new_plan.weeks:
+            for w_num, w_items in new_plan.weeks.items():
+                for idx, itm in enumerate(w_items):
+                    if itm.id in done_items:
+                        w_items[idx] = done_items[itm.id]
+
+        save_plan(learner_id, new_plan, db_path=db_path)
+        learner.plan = new_plan
+        learner = recompute_skill_status(learner)
+        save_learner(learner, db_path=db_path)
+        return learner, True
+
+    return learner, False
+
+    return learner, False
+
+
+def chat_with_agent(
+    learner_id: str,
+    question: str,
+    db_path: str = "edupath.db",
+) -> str:
+    """Orchestrate interactive conversational guidance with learner state context."""
+    learner = get_learner(learner_id, db_path=db_path)
+    if not learner:
+        raise ValueError(f"Learner {learner_id} not found")
+
+    chat_history = get_chat_history(learner_id, db_path=db_path)
+    answer = answer_question(state=learner, chat_history=chat_history, question=question)
+
+    save_chat_message(learner_id, "user", question, db_path=db_path)
+    save_chat_message(learner_id, "assistant", answer, db_path=db_path)
+    return answer
+
 
