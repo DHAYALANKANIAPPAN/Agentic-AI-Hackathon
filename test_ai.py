@@ -49,6 +49,32 @@ def test_phase2():
     print(plan.model_dump_json(indent=2))
     print("\nPhase 2 Test Complete!")
 
+def test_phase3():
+    print("1. Calling answer_question...")
+    from ai.core import answer_question, write_report_narrative
+    from shared.schemas.models import LearnerState, GapList, ProgressStats
+    
+    # Mock minimal state
+    state = LearnerState(
+        id="test-123",
+        gaps=GapList(target_role="Data Scientist", gaps=[]),
+        weeks_available=4,
+        hours_per_week=10.0
+    )
+    
+    answer = answer_question(state, [], "What is the difference between a list and a tuple in Python?")
+    print("\n--- ANSWER OUTPUT ---")
+    print(answer)
+    
+    print("\n2. Calling write_report_narrative...")
+    stats = ProgressStats(items_done=5, hours_spent=4.5)
+    report = write_report_narrative(stats, state)
+    print("\n--- REPORT OUTPUT ---")
+    print(report)
+    
+    print("\nPhase 3 Test Complete!")
+
 if __name__ == "__main__":
     # test_phase1()
-    test_phase2()
+    # test_phase2()
+    test_phase3()
