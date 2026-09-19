@@ -1,1 +1,27 @@
-.env\n__pycache__/\n*.pyc\nvenv/\n.venv/\n*.db\nuploads/
+# Environment variables & secrets
+.env
+
+# Bytecode & Caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual Environments
+venv/
+.venv/
+ENV/
+env/
+
+# SQLite & Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploads & User Files
+uploads/
+
+# Local documentation
+docs/
