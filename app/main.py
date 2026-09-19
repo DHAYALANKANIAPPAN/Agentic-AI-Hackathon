@@ -27,7 +27,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="EduPath - AI Learning Agent",
-    description="Product Layer (Member B) - Phase 1: Intake, Database, and UI",
+    description="EduPath Agentic AI Application",
     version="1.0.0",
     lifespan=lifespan,
 )
@@ -76,7 +76,7 @@ async def root():
         <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur sticky top-0 z-20">
             <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
                 <div class="flex items-center gap-2.5">
-                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-400 flex items-center justify-center font-heading font-extrabold text-white text-lg shadow-lg">E</div>
+                    <img src="/static/logo.png" class="w-10 h-10 rounded-xl object-cover shadow-lg">
                     <span class="font-heading font-bold text-xl tracking-tight text-white">EduPath</span>
                 </div>
             </div>
@@ -197,9 +197,7 @@ async def onboard_form():
         <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur sticky top-0 z-20">
             <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
                 <a href="/login" class="flex items-center gap-2.5">
-                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-400 flex items-center justify-center font-heading font-extrabold text-white text-lg shadow-lg">
-                        E
-                    </div>
+                    <img src="/static/logo.png" class="w-10 h-10 rounded-xl object-cover shadow-lg">
                     <span class="font-heading font-bold text-xl tracking-tight text-white">
                         EduPath <span class="text-xs uppercase font-semibold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">AI Agent</span>
                     </span>
@@ -216,7 +214,7 @@ async def onboard_form():
             <div class="text-center mb-8">
                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-300 border border-purple-500/20 mb-3">
                     <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
-                    Phase 1: Profile & Skill-Gap Analysis
+                    Profile & Skill-Gap Analysis
                 </span>
                 <h1 class="text-3xl sm:text-4xl font-extrabold text-white font-heading">
                     Discover Your <span class="gradient-text">Skill Gaps</span>
@@ -506,9 +504,7 @@ async def view_gaps(learner_id: str):
         <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur sticky top-0 z-20">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
                 <a href="/login" class="flex items-center gap-2.5">
-                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-400 flex items-center justify-center font-heading font-extrabold text-white text-lg shadow-lg">
-                        E
-                    </div>
+                    <img src="/static/logo.png" class="w-10 h-10 rounded-xl object-cover shadow-lg">
                     <span class="font-heading font-bold text-xl tracking-tight text-white">
                         EduPath <span class="text-xs uppercase font-semibold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">AI Agent</span>
                     </span>
@@ -527,9 +523,8 @@ async def view_gaps(learner_id: str):
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
                         <span>AI Tutor</span>
                     </a>
-                    <a href="/login" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-purple-900/40 hover:bg-purple-900/60 text-purple-300 border border-purple-800/50 transition-all">
-                        &larr; New Intake
-                    </a>
+                    <a href="/profile" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-800/80 hover:bg-slate-700 text-white border border-slate-700 transition-all">Profile</a>
+<a href="/logout" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-rose-900/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/50 transition-all">Logout</a>
                 </div>
             </div>
         </header>
@@ -543,7 +538,7 @@ async def view_gaps(learner_id: str):
                             <span class="px-2.5 py-0.5 rounded text-[11px] font-bold uppercase bg-purple-500/20 text-purple-300 border border-purple-500/30">
                                 Diagnostic Report
                             </span>
-                            <span class="text-xs text-slate-400 font-mono">Learner ID: {learner_id}</span>
+                            
                         </div>
                         <h1 class="text-2xl sm:text-3xl font-extrabold text-white font-heading">
                             Skill Gap Analysis for <span class="gradient-text">{target_role}</span>
@@ -881,9 +876,7 @@ async def view_weekly_plan(learner_id: str, week: int = 1, replanned: Optional[i
         <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur sticky top-0 z-20">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
                 <a href="/login" class="flex items-center gap-2.5">
-                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-400 flex items-center justify-center font-heading font-extrabold text-white text-lg shadow-lg">
-                        E
-                    </div>
+                    <img src="/static/logo.png" class="w-10 h-10 rounded-xl object-cover shadow-lg">
                     <span class="font-heading font-bold text-xl tracking-tight text-white">
                         EduPath <span class="text-xs uppercase font-semibold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">AI Agent</span>
                     </span>
@@ -902,9 +895,8 @@ async def view_weekly_plan(learner_id: str, week: int = 1, replanned: Optional[i
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
                         <span>AI Tutor Chat</span>
                     </a>
-                    <a href="/login" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-purple-900/40 hover:bg-purple-900/60 text-purple-300 border border-purple-800/50 transition-all">
-                        + New Intake
-                    </a>
+                    <a href="/profile" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-800/80 hover:bg-slate-700 text-white border border-slate-700 transition-all">Profile</a>
+<a href="/logout" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-rose-900/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/50 transition-all">Logout</a>
                 </div>
             </div>
         </header>
@@ -921,7 +913,7 @@ async def view_weekly_plan(learner_id: str, week: int = 1, replanned: Optional[i
                             <span class="px-2.5 py-0.5 rounded text-[10px] font-bold uppercase bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
                                 Adaptive Learning Plan (v{plan.version if plan else 1})
                             </span>
-                            <span class="text-xs text-slate-400 font-mono">Learner: {learner_id}</span>
+                            
                         </div>
                         <h1 class="text-2xl sm:text-3xl font-extrabold text-white font-heading">
                             Personalized Roadmap: <span class="gradient-text">{learner.gaps.target_role if learner.gaps else 'Career Path'}</span>
@@ -1140,7 +1132,7 @@ async def view_dashboard(learner_id: str):
         <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur sticky top-0 z-20">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
                 <a href="/login" class="flex items-center gap-2.5">
-                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-400 flex items-center justify-center font-bold text-white text-lg">E</div>
+                    <img src="/static/logo.png" class="w-10 h-10 rounded-xl object-cover shadow-lg">
                     <span class="font-bold text-xl text-white">EduPath <span class="text-xs uppercase px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300">Dashboard</span></span>
                 </a>
                 <div class="flex items-center gap-3">
@@ -1162,7 +1154,7 @@ async def view_dashboard(learner_id: str):
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Learner Progress Dashboard</h1>
-                    <p class="text-xs text-slate-400 mt-1">Learner ID: {learner_id} &bull; Target: {learner.gaps.target_role if learner.gaps else 'Role'}</p>
+                    
                 </div>
                 <div class="flex items-center gap-2">
                     <a href="/report/{learner_id}" class="px-4 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white shadow-lg transition-all flex items-center gap-2">
@@ -1388,9 +1380,7 @@ async def view_chat(learner_id: str):
         <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur sticky top-0 z-20">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
                 <a href="/login" class="flex items-center gap-2.5">
-                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-400 flex items-center justify-center font-heading font-extrabold text-white text-lg shadow-lg">
-                        E
-                    </div>
+                    <img src="/static/logo.png" class="w-10 h-10 rounded-xl object-cover shadow-lg">
                     <span class="font-heading font-bold text-xl tracking-tight text-white">
                         EduPath <span class="text-xs uppercase font-semibold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">AI Coach</span>
                     </span>
@@ -1919,9 +1909,7 @@ async def view_progress_report(learner_id: str):
         <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur sticky top-0 z-20 no-print">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
                 <a href="/login" class="flex items-center gap-2.5">
-                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-400 flex items-center justify-center font-heading font-extrabold text-white text-lg shadow-lg">
-                        E
-                    </div>
+                    <img src="/static/logo.png" class="w-10 h-10 rounded-xl object-cover shadow-lg">
                     <span class="font-heading font-bold text-xl tracking-tight text-white">
                         EduPath <span class="text-xs uppercase font-semibold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">Report</span>
                     </span>
@@ -1959,7 +1947,7 @@ async def view_progress_report(learner_id: str):
                             Progress & Competency Report
                         </h1>
                         <p class="text-xs sm:text-sm text-slate-300 mt-1">
-                            Learner: <strong class="text-white font-mono">{learner_id}</strong> &bull; Target Career Role: <span class="gradient-text font-bold">{target_role}</span> &bull; Generated: {generated_at}
+                            Target Career Role: <span class="gradient-text font-bold">{target_role}</span> &bull; Generated: {generated_at}
                         </p>
                     </div>
 
@@ -2136,7 +2124,7 @@ async def view_progress_report(learner_id: str):
 
         <!-- Footer -->
         <footer class="mt-auto border-t border-slate-900 py-6 text-center text-xs text-slate-500 no-print">
-            <p>EduPath Agentic AI Hackathon &bull; Phase 4 Evaluation Report &bull; Powered by FastAPI & Agentic AI</p>
+            <p>EduPath Agentic AI Hackathon &bull; Progress Report &bull; Powered by FastAPI & Agentic AI</p>
         </footer>
     
 <script>
