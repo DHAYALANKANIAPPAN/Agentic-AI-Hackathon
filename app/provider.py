@@ -6,7 +6,10 @@ Member A edits this on `develop` to switch from mock to real functions.
 # Import real AI functions safely
 try:
     from ai import core as real_ai
-except Exception:
+except Exception as e:
+    import traceback
+    traceback.print_exc()
+    print(f'Failed to import ai.core: {e}')
     real_ai = None
 # Import mock AI functions
 from mocks import mock_ai
