@@ -71,7 +71,7 @@ def onboard_learner(
         activity_log=[],
         struggle_flags=[],
         hours_per_week=10.0,
-        weeks_available=4,
+        weeks_available=1,
     )
 
     # 4. Save to database
@@ -397,7 +397,7 @@ def seed_demo_learner(db_path: str = "edupath.db") -> str:
         activity_log=[],
         struggle_flags=[],
         hours_per_week=10.0,
-        weeks_available=4,
+        weeks_available=1,
     )
 
     clear_learner_history(demo_id, db_path=db_path)

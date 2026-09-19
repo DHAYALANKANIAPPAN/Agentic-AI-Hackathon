@@ -2,6 +2,12 @@ from typing import List, Dict, Any
 from shared.schemas.models import (
     SkillProfile, GapList, Resource, WeeklyPlan, PlanItem, ResourceType, LearnerState, ProgressStats, SkillLevel, GapStatus, Gap, Objective, Skill
 )
+
+_cache_analyze = {}
+_cache_gaps = {}
+_cache_plan = {}
+_cache_report = {}
+
 from ai import llm
 from ai.doc_reader import extract_text_from_file
 
@@ -12,7 +18,7 @@ def analyze_profile(form_text: str, document_texts: List[str]) -> SkillProfile:
         combined_text += f"Document {idx + 1}:\n{doc_text}\n\n"
         
     prompt = f"""
-    Analyze the following user profile and documents. Extract up to 25 skills that the user possesses.
+    Analyze the following user profile and documents. Extract up to 5 skills that the user possesses.
     For each skill, determine its level (beginner, intermediate, advanced) and provide a short snippet of evidence from the text.
     
     User Information:
@@ -55,7 +61,7 @@ def find_gaps(profile: SkillProfile, target_role: str) -> GapList:
     2. Compare them against the user's current skills.
     3. Label each required skill as 'has', 'partial', or 'missing'.
     4. Assign a priority (1 is highest priority/foundational, higher numbers are lower priority/advanced).
-    5. For each 'partial' or 'missing' skill, generate 2 to 4 learning objectives with hour estimates.
+    5. For each 'partial' or 'missing' skill, generate 1 learning objective with hour estimates.
     
     Output this exactly matching the GapList schema.
     """
