@@ -17,7 +17,7 @@ import openai
 
 client = OpenAI(
   base_url = "https://integrate.api.nvidia.com/v1",
-  api_key = os.environ.get("NVIDIA_API_KEY")
+  api_key = os.environ.get("NVIDIA_API_KEY", "missing_key")
 )
 
 def generate_text(prompt: str, model_name: str = "meta/llama-3.2-11b-vision-instruct") -> str:

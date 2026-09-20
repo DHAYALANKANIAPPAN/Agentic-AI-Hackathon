@@ -79,21 +79,7 @@ async def root():
                     <img src="/static/logo.png" class="w-10 h-10 rounded-xl object-cover shadow-lg">
                     <span class="font-heading font-bold text-xl tracking-tight text-white">EduPath</span>
                 </div>
-                <div class="flex items-center gap-4">
-                    <div class="relative group inline-block">
-                        <button class="w-8 h-8 rounded-full overflow-hidden border border-slate-700 hover:border-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all">
-                            <img src="https://ui-avatars.com/api/?name=User&background=4f46e5&color=fff" alt="Avatar" class="w-full h-full object-cover">
-                        </button>
-                        <div class="absolute right-0 top-full mt-2 w-56 bg-slate-900 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all flex flex-col z-50 overflow-hidden pt-1">
-                            <div class="px-4 py-3 border-b border-slate-800">
-                                <p class="text-xs text-slate-400 font-mono truncate">Logged in</p>
-                            </div>
-                            <a href="/profile" class="px-4 py-2 text-sm text-slate-300 hover:bg-purple-900/40 hover:text-purple-300 transition-colors">Profile</a>
-                            <a href="/roles" class="px-4 py-2 text-sm text-slate-300 hover:bg-purple-900/40 hover:text-purple-300 transition-colors">Roles & Documents</a>
-                            <a href="/logout" class="px-4 py-2 text-sm text-rose-400 hover:bg-rose-900/40 transition-colors border-t border-slate-800">Logout</a>
-                        </div>
-                    </div>
-                </div>
+
             </div>
         </header>
 
@@ -1590,7 +1576,7 @@ async def handle_chat_message(
 ):
     """Process chat question and redirect back to chat UI."""
     from app.provider import AI_ERROR
-    from app.state import get_learner, save_learner
+    from app.repository import get_learner, save_learner
     if AI_ERROR:
         learner = get_learner(learner_id)
         if learner:
@@ -2518,7 +2504,7 @@ async def profile_page(request: Request):
 
 @app.get("/role/{learner_id}", response_class=HTMLResponse)
 async def inspect_role_page(learner_id: str, request: Request):
-    from app.state import get_learner
+    from app.repository import get_learner
     learner = get_learner(learner_id)
     if not learner:
         return RedirectResponse(url="/roles")
