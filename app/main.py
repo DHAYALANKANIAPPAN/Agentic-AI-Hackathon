@@ -135,6 +135,7 @@ async def root():
 
         document.querySelectorAll('a').forEach(link => {{
             link.addEventListener('click', (e) => {{
+                if(window.location.pathname.startsWith('/chat')) return; {{
                 const href = link.getAttribute('href');
                 if (href && !href.startsWith('#') && link.getAttribute('target') !== '_blank') {{
                     showLoading();
@@ -143,7 +144,8 @@ async def root():
         }});
 
         document.querySelectorAll('form').forEach(form => {{
-            form.addEventListener('submit', () => {{
+            form.addEventListener('submit', (e) => {{
+                if(form.id === 'chat-form') return; {{
                 showLoading();
             }});
         }});
@@ -355,6 +357,7 @@ async def onboard_form():
 
         document.querySelectorAll('a').forEach(link => {{
             link.addEventListener('click', (e) => {{
+                if(window.location.pathname.startsWith('/chat')) return; {{
                 const href = link.getAttribute('href');
                 if (href && !href.startsWith('#') && link.getAttribute('target') !== '_blank') {{
                     showLoading();
@@ -363,7 +366,8 @@ async def onboard_form():
         }});
 
         document.querySelectorAll('form').forEach(form => {{
-            form.addEventListener('submit', () => {{
+            form.addEventListener('submit', (e) => {{
+                if(form.id === 'chat-form') return; {{
                 showLoading();
             }});
         }});
@@ -641,6 +645,7 @@ async def view_gaps(learner_id: str):
 
         document.querySelectorAll('a').forEach(link => {{
             link.addEventListener('click', (e) => {{
+                if(window.location.pathname.startsWith('/chat')) return; {{
                 const href = link.getAttribute('href');
                 if (href && !href.startsWith('#') && link.getAttribute('target') !== '_blank') {{
                     showLoading();
@@ -649,7 +654,8 @@ async def view_gaps(learner_id: str):
         }});
 
         document.querySelectorAll('form').forEach(form => {{
-            form.addEventListener('submit', () => {{
+            form.addEventListener('submit', (e) => {{
+                if(form.id === 'chat-form') return; {{
                 showLoading();
             }});
         }});
@@ -990,6 +996,7 @@ async def view_weekly_plan(learner_id: str, week: int = 1, replanned: Optional[i
 
         document.querySelectorAll('a').forEach(link => {{
             link.addEventListener('click', (e) => {{
+                if(window.location.pathname.startsWith('/chat')) return; {{
                 const href = link.getAttribute('href');
                 if (href && !href.startsWith('#') && link.getAttribute('target') !== '_blank') {{
                     showLoading();
@@ -998,7 +1005,8 @@ async def view_weekly_plan(learner_id: str, week: int = 1, replanned: Optional[i
         }});
 
         document.querySelectorAll('form').forEach(form => {{
-            form.addEventListener('submit', () => {{
+            form.addEventListener('submit', (e) => {{
+                if(form.id === 'chat-form') return; {{
                 showLoading();
             }});
         }});
@@ -1237,6 +1245,7 @@ async def view_dashboard(learner_id: str):
 
         document.querySelectorAll('a').forEach(link => {{
             link.addEventListener('click', (e) => {{
+                if(window.location.pathname.startsWith('/chat')) return; {{
                 const href = link.getAttribute('href');
                 if (href && !href.startsWith('#') && link.getAttribute('target') !== '_blank') {{
                     showLoading();
@@ -1245,7 +1254,8 @@ async def view_dashboard(learner_id: str):
         }});
 
         document.querySelectorAll('form').forEach(form => {{
-            form.addEventListener('submit', () => {{
+            form.addEventListener('submit', (e) => {{
+                if(form.id === 'chat-form') return; {{
                 showLoading();
             }});
         }});
@@ -1548,6 +1558,7 @@ async def view_chat(learner_id: str):
 
         document.querySelectorAll('a').forEach(link => {{
             link.addEventListener('click', (e) => {{
+                if(window.location.pathname.startsWith('/chat')) return; {{
                 const href = link.getAttribute('href');
                 if (href && !href.startsWith('#') && link.getAttribute('target') !== '_blank') {{
                     showLoading();
@@ -1556,7 +1567,8 @@ async def view_chat(learner_id: str):
         }});
 
         document.querySelectorAll('form').forEach(form => {{
-            form.addEventListener('submit', () => {{
+            form.addEventListener('submit', (e) => {{
+                if(form.id === 'chat-form') return; {{
                 showLoading();
             }});
         }});
@@ -2167,6 +2179,7 @@ async def view_progress_report(learner_id: str):
 
         document.querySelectorAll('a').forEach(link => {{
             link.addEventListener('click', (e) => {{
+                if(window.location.pathname.startsWith('/chat')) return; {{
                 const href = link.getAttribute('href');
                 if (href && !href.startsWith('#') && link.getAttribute('target') !== '_blank') {{
                     showLoading();
@@ -2175,7 +2188,8 @@ async def view_progress_report(learner_id: str):
         }});
 
         document.querySelectorAll('form').forEach(form => {{
-            form.addEventListener('submit', () => {{
+            form.addEventListener('submit', (e) => {{
+                if(form.id === 'chat-form') return; {{
                 showLoading();
             }});
         }});
@@ -2301,6 +2315,7 @@ async def login_page():
 
         document.querySelectorAll('a').forEach(link => {{
             link.addEventListener('click', (e) => {{
+                if(window.location.pathname.startsWith('/chat')) return; {{
                 const href = link.getAttribute('href');
                 if (href && !href.startsWith('#') && link.getAttribute('target') !== '_blank') {{
                     showLoading();
@@ -2309,7 +2324,8 @@ async def login_page():
         }});
 
         document.querySelectorAll('form').forEach(form => {{
-            form.addEventListener('submit', () => {{
+            form.addEventListener('submit', (e) => {{
+                if(form.id === 'chat-form') return; {{
                 showLoading();
             }});
         }});
@@ -2432,6 +2448,7 @@ async def roles_page(request: Request):
 
         document.querySelectorAll('a').forEach(link => {{
             link.addEventListener('click', (e) => {{
+                if(window.location.pathname.startsWith('/chat')) return; {{
                 const href = link.getAttribute('href');
                 if (href && !href.startsWith('#') && link.getAttribute('target') !== '_blank') {{
                     showLoading();
@@ -2440,7 +2457,8 @@ async def roles_page(request: Request):
         }});
 
         document.querySelectorAll('form').forEach(form => {{
-            form.addEventListener('submit', () => {{
+            form.addEventListener('submit', (e) => {{
+                if(form.id === 'chat-form') return; {{
                 showLoading();
             }});
         }});
@@ -2615,7 +2633,7 @@ async def handle_role_upload(learner_id: str, file: UploadFile = File(...)):
         learner.activity_log.append(ActivityLog(
             item_id=f"doc_{file.filename}", 
             minutes_spent=0, 
-            rating="DOCUMENT", 
+            rating="ok", 
             timestamp=datetime.datetime.now()
         ))
         save_learner(learner)

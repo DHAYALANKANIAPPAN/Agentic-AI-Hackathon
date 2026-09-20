@@ -77,9 +77,23 @@ def find_gaps(profile_text: str, target_role: str) -> GapList:
                 return fallback_list
                 
         # Generic fallback
+        target_role_lower = target_role.lower()
+        if "devops" in target_role_lower:
+            skill1, skill2, skill3 = "CI/CD Pipelines", "Containerization (Docker/Kubernetes)", "Infrastructure as Code"
+        elif "cloud" in target_role_lower:
+            skill1, skill2, skill3 = "Cloud Architecture", "AWS/Azure Services", "Cloud Security"
+        elif "data" in target_role_lower:
+            skill1, skill2, skill3 = "Python Data Stack", "Machine Learning", "SQL & Databases"
+        else:
+            skill1, skill2, skill3 = f"{target_role} Fundamentals", "Advanced Concepts", "Best Practices"
+
         return GapList(
             target_role=target_role,
-            gaps=[Gap(required_skill="Core Concepts", status=GapStatus.MISSING, priority=1, objectives=[Objective(description="Learn fundamentals", hours_estimated=10.0)])]
+            gaps=[
+                Gap(required_skill=skill1, status=GapStatus.MISSING, priority=1, objectives=[Objective(description=f"Learn core {skill1}", hours_estimated=10.0)]),
+                Gap(required_skill=skill2, status=GapStatus.MISSING, priority=2, objectives=[Objective(description=f"Master {skill2}", hours_estimated=15.0)]),
+                Gap(required_skill=skill3, status=GapStatus.PARTIAL, priority=3, objectives=[Objective(description=f"Review {skill3}", hours_estimated=5.0)])
+            ]
         )
 
 from pydantic import BaseModel
@@ -139,7 +153,7 @@ def generate_plan(gaps: GapList, hours_per_week: float, weeks_available: int) ->
     Allocate the objectives across the {weeks_available} weeks.
     For each week (week_number 1 to {weeks_available}), provide a 'goal_sentence' and a list of 'items'.
     CRITICAL REQUIREMENTS:
-    1. LIMIT to exactly 2 items total per week to be concise.
+    1. LIMIT to exactly 2 items total per week to be concise. YOU MUST GENERATE EXACTLY 1 WEEK (Week 1) AND NO MORE.
     2. Every week MUST include at least one practice task or project (set item_type strictly to "practice" or "project").
     3. TO SAVE SPACE: OMIT the fields "objective_ref", "skill_ref", "status", "minutes_spent", "rating", and "quiz_score". YOU MUST INCLUDE "resources" (limit to exactly 1 resource per item). ONLY output "id", "item_type", "description", and "resources".
     2. For URLs, NEVER invent links. Only provide safe search links. Example: https://www.youtube.com/results?search_query=Topic
@@ -166,20 +180,47 @@ def generate_plan(gaps: GapList, hours_per_week: float, weeks_available: int) ->
     except Exception as e:
         import logging
         logging.getLogger(__name__).warning(f"Failed to generate plan: {e}")
-        # Fallback empty plan
         import uuid
-        from shared.schemas.models import PlanItem
+        from shared.schemas.models import PlanItem, Resource, ResourceType
+        
+        target_role = gaps.target_role.lower() if gaps else ""
+        
+        if "devops" in target_role:
+            skill = "CI/CD Pipelines & Docker"
+            desc = "Build a basic Jenkins or GitHub Actions pipeline deploying a containerized app."
+        elif "data" in target_role:
+            skill = "Machine Learning Models"
+            desc = "Practice building a predictive model using Scikit-Learn on a real dataset."
+        elif "cloud" in target_role:
+            skill = "AWS Architecture"
+            desc = "Design and deploy a highly available VPC architecture with public/private subnets."
+        elif "software" in target_role:
+            skill = "Data Structures & APIs"
+            desc = "Practice solving algorithmic challenges and building a basic REST API."
+        else:
+            skill = f"{gaps.target_role} Core Skills" if gaps else "Core Skills"
+            desc = f"Practice the foundational skills required for {gaps.target_role}." if gaps else "Practice foundational skills."
+            
         return WeeklyPlan(
             version=1,
-            goal_sentences={1: "Begin working on your primary gaps."},
+            goal_sentences={1: f"Master {skill} with hands-on practice."},
             weeks={1: [
                 PlanItem(
                     id=str(uuid.uuid4()),
                     item_type="practice",
-                    description="Spend time reviewing core concepts and practicing your fundamentals.",
-                    resources=[],
+                    description=desc,
+                    estimated_minutes=120,
                     status="todo",
-                    minutes_spent=0
+                    minutes_spent=0,
+                    resources=[
+                        Resource(
+                            title=f"Hands-on {skill} Tutorial",
+                            url="https://www.youtube.com/results?search_query=" + skill.replace(" ", "+"),
+                            type=ResourceType.VIDEO,
+                            level="beginner",
+                            time_estimate_minutes=60
+                        )
+                    ]
                 )
             ]}
         )
