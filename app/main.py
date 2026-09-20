@@ -122,7 +122,7 @@ async def root():
                     <h3 class="text-xl font-bold text-white">Skill Verification Quiz</h3>
                     <p class="text-sm text-slate-400 mt-1">Answer these questions to log your progress.</p>
                 </div>
-                <form action="/quiz/{learner_id}/submit" method="POST" class="p-6 space-y-5">
+                <form action="/quiz/{learner_id}/submit" method="POST" class="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
                     <div>
                         <label class="block text-sm font-semibold text-slate-300 mb-2">1. What is the primary purpose of version control (like Git)?</label>
                         <div class="space-y-2">
@@ -139,7 +139,31 @@ async def root():
                             <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="C"> C) Stack</label>
                         </div>
                     </div>
-                    <div class="pt-4 flex gap-3">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">3. In REST APIs, which HTTP method is typically used to update an existing resource?</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q3" value="A" required> A) POST</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q3" value="B"> B) PUT / PATCH</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q3" value="C"> C) GET</label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">4. What does CI/CD stand for in modern software development?</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q4" value="A" required> A) Continuous Integration / Continuous Deployment</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q4" value="B"> B) Code Inspection / Code Delivery</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q4" value="C"> C) Constant Iteration / Constant Deployment</label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">5. What is the main benefit of containerization (e.g., Docker)?</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q5" value="A" required> A) It makes code compile faster</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q5" value="B"> B) It provides a consistent environment across development and production</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q5" value="C"> C) It automatically fixes syntax errors</label>
+                        </div>
+                    </div>
+                    <div class="pt-4 flex gap-3 sticky bottom-0 bg-slate-900 pb-2">
                         <button type="button" onclick="document.getElementById('quiz-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-all">Cancel</button>
                         <button type="submit" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all">Submit Answers</button>
                     </div>
@@ -663,7 +687,7 @@ async def view_gaps(learner_id: str):
                     <h3 class="text-xl font-bold text-white">Skill Verification Quiz</h3>
                     <p class="text-sm text-slate-400 mt-1">Answer these questions to log your progress.</p>
                 </div>
-                <form action="/quiz/{learner_id}/submit" method="POST" class="p-6 space-y-5">
+                <form action="/quiz/{learner_id}/submit" method="POST" class="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
                     <div>
                         <label class="block text-sm font-semibold text-slate-300 mb-2">1. What is the primary purpose of version control (like Git)?</label>
                         <div class="space-y-2">
@@ -680,7 +704,31 @@ async def view_gaps(learner_id: str):
                             <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="C"> C) Stack</label>
                         </div>
                     </div>
-                    <div class="pt-4 flex gap-3">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">3. In REST APIs, which HTTP method is typically used to update an existing resource?</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q3" value="A" required> A) POST</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q3" value="B"> B) PUT / PATCH</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q3" value="C"> C) GET</label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">4. What does CI/CD stand for in modern software development?</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q4" value="A" required> A) Continuous Integration / Continuous Deployment</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q4" value="B"> B) Code Inspection / Code Delivery</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q4" value="C"> C) Constant Iteration / Constant Deployment</label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">5. What is the main benefit of containerization (e.g., Docker)?</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q5" value="A" required> A) It makes code compile faster</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q5" value="B"> B) It provides a consistent environment across development and production</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q5" value="C"> C) It automatically fixes syntax errors</label>
+                        </div>
+                    </div>
+                    <div class="pt-4 flex gap-3 sticky bottom-0 bg-slate-900 pb-2">
                         <button type="button" onclick="document.getElementById('quiz-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-all">Cancel</button>
                         <button type="submit" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all">Submit Answers</button>
                     </div>
@@ -1302,7 +1350,7 @@ async def view_dashboard(learner_id: str):
                     <h3 class="text-xl font-bold text-white">Skill Verification Quiz</h3>
                     <p class="text-sm text-slate-400 mt-1">Answer these questions to log your progress.</p>
                 </div>
-                <form action="/quiz/{learner_id}/submit" method="POST" class="p-6 space-y-5">
+                <form action="/quiz/{learner_id}/submit" method="POST" class="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
                     <div>
                         <label class="block text-sm font-semibold text-slate-300 mb-2">1. What is the primary purpose of version control (like Git)?</label>
                         <div class="space-y-2">
@@ -1319,7 +1367,31 @@ async def view_dashboard(learner_id: str):
                             <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="C"> C) Stack</label>
                         </div>
                     </div>
-                    <div class="pt-4 flex gap-3">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">3. In REST APIs, which HTTP method is typically used to update an existing resource?</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q3" value="A" required> A) POST</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q3" value="B"> B) PUT / PATCH</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q3" value="C"> C) GET</label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">4. What does CI/CD stand for in modern software development?</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q4" value="A" required> A) Continuous Integration / Continuous Deployment</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q4" value="B"> B) Code Inspection / Code Delivery</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q4" value="C"> C) Constant Iteration / Constant Deployment</label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">5. What is the main benefit of containerization (e.g., Docker)?</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q5" value="A" required> A) It makes code compile faster</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q5" value="B"> B) It provides a consistent environment across development and production</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q5" value="C"> C) It automatically fixes syntax errors</label>
+                        </div>
+                    </div>
+                    <div class="pt-4 flex gap-3 sticky bottom-0 bg-slate-900 pb-2">
                         <button type="button" onclick="document.getElementById('quiz-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-all">Cancel</button>
                         <button type="submit" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all">Submit Answers</button>
                     </div>
@@ -2262,7 +2334,7 @@ async def view_progress_report(learner_id: str):
                     <h3 class="text-xl font-bold text-white">Skill Verification Quiz</h3>
                     <p class="text-sm text-slate-400 mt-1">Answer these questions to log your progress.</p>
                 </div>
-                <form action="/quiz/{learner_id}/submit" method="POST" class="p-6 space-y-5">
+                <form action="/quiz/{learner_id}/submit" method="POST" class="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
                     <div>
                         <label class="block text-sm font-semibold text-slate-300 mb-2">1. What is the primary purpose of version control (like Git)?</label>
                         <div class="space-y-2">
@@ -2279,7 +2351,31 @@ async def view_progress_report(learner_id: str):
                             <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="C"> C) Stack</label>
                         </div>
                     </div>
-                    <div class="pt-4 flex gap-3">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">3. In REST APIs, which HTTP method is typically used to update an existing resource?</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q3" value="A" required> A) POST</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q3" value="B"> B) PUT / PATCH</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q3" value="C"> C) GET</label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">4. What does CI/CD stand for in modern software development?</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q4" value="A" required> A) Continuous Integration / Continuous Deployment</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q4" value="B"> B) Code Inspection / Code Delivery</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q4" value="C"> C) Constant Iteration / Constant Deployment</label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">5. What is the main benefit of containerization (e.g., Docker)?</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q5" value="A" required> A) It makes code compile faster</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q5" value="B"> B) It provides a consistent environment across development and production</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q5" value="C"> C) It automatically fixes syntax errors</label>
+                        </div>
+                    </div>
+                    <div class="pt-4 flex gap-3 sticky bottom-0 bg-slate-900 pb-2">
                         <button type="button" onclick="document.getElementById('quiz-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-all">Cancel</button>
                         <button type="submit" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all">Submit Answers</button>
                     </div>
@@ -2781,7 +2877,7 @@ async def inspect_role_page(learner_id: str, request: Request):
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                         </div>
                         <div>
-                            <h3 class="font-bold text-white">${file.name}</h3>
+                            <h3 class="font-bold text-white">${{file.name}}</h3>
                             <p class="text-xs text-emerald-400 flex items-center gap-1 mt-0.5"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Processed</p>
                         </div>
                     </div>
@@ -2835,17 +2931,23 @@ async def submit_quiz(learner_id: str, request: Request):
     form_data = await request.form()
     q1 = form_data.get("q1")
     q2 = form_data.get("q2")
+    q3 = form_data.get("q3")
+    q4 = form_data.get("q4")
+    q5 = form_data.get("q5")
     
     score = 0
-    if q1 == "B": score += 50
-    if q2 == "C": score += 50
+    if q1 == "B": score += 20
+    if q2 == "C": score += 20
+    if q3 == "B": score += 20
+    if q4 == "A": score += 20
+    if q5 == "B": score += 20
     
     from app.repository import log_activity
     from shared.schemas.models import ActivityLog
     import datetime
     
     log_activity(learner_id, ActivityLog(
-        item_id="Skill Verification Quiz", 
+        item_id="Skill Verification Quiz (5 Qs)", 
         minutes_spent=15, 
         rating="ok", 
         quiz_score=float(score),
