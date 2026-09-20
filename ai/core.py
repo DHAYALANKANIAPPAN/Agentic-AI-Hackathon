@@ -78,21 +78,28 @@ def find_gaps(profile_text: str, target_role: str) -> GapList:
                 
         # Generic fallback
         target_role_lower = target_role.lower()
+        skills = []
         if "devops" in target_role_lower:
-            skill1, skill2, skill3 = "CI/CD Pipelines", "Containerization (Docker/Kubernetes)", "Infrastructure as Code"
+            skills = ["CI/CD Pipelines", "Docker/Kubernetes", "Infrastructure as Code", "Linux Administration", "Cloud Networking"]
         elif "cloud" in target_role_lower:
-            skill1, skill2, skill3 = "Cloud Architecture", "AWS/Azure Services", "Cloud Security"
+            skills = ["AWS Solutions Architecture", "Azure Fundamentals", "Cloud Security", "Serverless Computing", "Cost Optimization"]
         elif "data" in target_role_lower:
-            skill1, skill2, skill3 = "Python Data Stack", "Machine Learning", "SQL & Databases"
+            skills = ["Python Data Stack", "Machine Learning", "SQL & Databases", "Data Visualization", "Big Data (Spark)"]
+        elif "security" in target_role_lower or "hacker" in target_role_lower or "pentest" in target_role_lower:
+            skills = ["Penetration Testing", "Network Security", "Cryptography", "Web App Exploitation", "Incident Response"]
+        elif "software" in target_role_lower or "java" in target_role_lower or "developer" in target_role_lower:
+            skills = ["Java Spring Boot", "Microservices", "Data Structures", "REST APIs", "System Design"]
         else:
-            skill1, skill2, skill3 = f"{target_role} Fundamentals", "Advanced Concepts", "Best Practices"
+            skills = [f"{target_role} Fundamentals", "Advanced Concepts", "Best Practices", "Industry Tools", "Real-world Projects"]
 
         return GapList(
             target_role=target_role,
             gaps=[
-                Gap(required_skill=skill1, status=GapStatus.MISSING, priority=1, objectives=[Objective(description=f"Learn core {skill1}", hours_estimated=10.0)]),
-                Gap(required_skill=skill2, status=GapStatus.MISSING, priority=2, objectives=[Objective(description=f"Master {skill2}", hours_estimated=15.0)]),
-                Gap(required_skill=skill3, status=GapStatus.PARTIAL, priority=3, objectives=[Objective(description=f"Review {skill3}", hours_estimated=5.0)])
+                Gap(required_skill=skills[0], status=GapStatus.MISSING, priority=1, objectives=[Objective(description=f"Learn core {skills[0]}", hours_estimated=10.0)]),
+                Gap(required_skill=skills[1], status=GapStatus.MISSING, priority=2, objectives=[Objective(description=f"Master {skills[1]}", hours_estimated=15.0)]),
+                Gap(required_skill=skills[2], status=GapStatus.PARTIAL, priority=3, objectives=[Objective(description=f"Review {skills[2]}", hours_estimated=8.0)]),
+                Gap(required_skill=skills[3], status=GapStatus.PARTIAL, priority=4, objectives=[Objective(description=f"Practice {skills[3]}", hours_estimated=12.0)]),
+                Gap(required_skill=skills[4], status=GapStatus.MISSING, priority=5, objectives=[Objective(description=f"Apply {skills[4]}", hours_estimated=20.0)])
             ]
         )
 
@@ -184,45 +191,43 @@ def generate_plan(gaps: GapList, hours_per_week: float, weeks_available: int) ->
         from shared.schemas.models import PlanItem, Resource, ResourceType
         
         target_role = gaps.target_role.lower() if gaps else ""
+        items = []
+        goal = ""
         
         if "devops" in target_role:
-            skill = "CI/CD Pipelines & Docker"
-            desc = "Build a basic Jenkins or GitHub Actions pipeline deploying a containerized app."
+            goal = "Master CI/CD and Containerization with hands-on labs."
+            items = [
+                PlanItem(id=str(uuid.uuid4()), item_type="practice", description="Complete Docker tutorial and build a container.", estimated_minutes=120, status="todo", minutes_spent=0, resources=[Resource(title="Docker for Beginners", url="https://www.docker.com/101-tutorial/", type=ResourceType.COURSE, level="beginner", time_estimate_minutes=60)]),
+                PlanItem(id=str(uuid.uuid4()), item_type="practice", description="Setup a GitHub Actions pipeline.", estimated_minutes=120, status="todo", minutes_spent=0, resources=[Resource(title="GitHub Actions Guide", url="https://docs.github.com/en/actions", type=ResourceType.ARTICLE, level="intermediate", time_estimate_minutes=60)])
+            ]
         elif "data" in target_role:
-            skill = "Machine Learning Models"
-            desc = "Practice building a predictive model using Scikit-Learn on a real dataset."
-        elif "cloud" in target_role:
-            skill = "AWS Architecture"
-            desc = "Design and deploy a highly available VPC architecture with public/private subnets."
-        elif "software" in target_role:
-            skill = "Data Structures & APIs"
-            desc = "Practice solving algorithmic challenges and building a basic REST API."
+            goal = "Practice Data Analysis and ML."
+            items = [
+                PlanItem(id=str(uuid.uuid4()), item_type="practice", description="Complete Pandas challenges on Kaggle.", estimated_minutes=120, status="todo", minutes_spent=0, resources=[Resource(title="Kaggle Pandas Course", url="https://www.kaggle.com/learn/pandas", type=ResourceType.COURSE, level="beginner", time_estimate_minutes=60)]),
+                PlanItem(id=str(uuid.uuid4()), item_type="practice", description="Train a Scikit-Learn model.", estimated_minutes=120, status="todo", minutes_spent=0, resources=[Resource(title="Scikit-Learn Tutorial", url="https://scikit-learn.org/stable/tutorial/index.html", type=ResourceType.ARTICLE, level="intermediate", time_estimate_minutes=60)])
+            ]
+        elif "security" in target_role or "hacker" in target_role or "pentest" in target_role:
+            goal = "Solve beginner CTF challenges and HackTheBox rooms."
+            items = [
+                PlanItem(id=str(uuid.uuid4()), item_type="practice", description="Complete HackTheBox starting point room.", estimated_minutes=120, status="todo", minutes_spent=0, resources=[Resource(title="HackTheBox Starting Point", url="https://app.hackthebox.com/starting-point", type=ResourceType.COURSE, level="beginner", time_estimate_minutes=60)]),
+                PlanItem(id=str(uuid.uuid4()), item_type="practice", description="Practice Nmap scanning techniques.", estimated_minutes=120, status="todo", minutes_spent=0, resources=[Resource(title="Nmap Tutorial", url="https://nmap.org/book/man.html", type=ResourceType.ARTICLE, level="intermediate", time_estimate_minutes=60)])
+            ]
+        elif "software" in target_role or "java" in target_role:
+            goal = "Build a Java backend and practice algorithms."
+            items = [
+                PlanItem(id=str(uuid.uuid4()), item_type="practice", description="Learn Java fundamentals at Javatpoint.", estimated_minutes=120, status="todo", minutes_spent=0, resources=[Resource(title="Javatpoint Java Tutorial", url="https://www.javatpoint.com/java-tutorial", type=ResourceType.ARTICLE, level="beginner", time_estimate_minutes=60)]),
+                PlanItem(id=str(uuid.uuid4()), item_type="practice", description="Solve LeetCode Data Structures problems.", estimated_minutes=120, status="todo", minutes_spent=0, resources=[Resource(title="LeetCode Top 100", url="https://leetcode.com/problemset/all/", type=ResourceType.COURSE, level="intermediate", time_estimate_minutes=60)])
+            ]
         else:
-            skill = f"{gaps.target_role} Core Skills" if gaps else "Core Skills"
-            desc = f"Practice the foundational skills required for {gaps.target_role}." if gaps else "Practice foundational skills."
+            goal = f"Practice the foundational skills required for {gaps.target_role}." if gaps else "Practice foundational skills."
+            items = [
+                PlanItem(id=str(uuid.uuid4()), item_type="practice", description=goal, estimated_minutes=120, status="todo", minutes_spent=0, resources=[Resource(title=f"{gaps.target_role} Guide", url="https://www.youtube.com/results?search_query=" + str(gaps.target_role).replace(" ", "+"), type=ResourceType.VIDEO, level="beginner", time_estimate_minutes=60)])
+            ]
             
         return WeeklyPlan(
             version=1,
-            goal_sentences={1: f"Master {skill} with hands-on practice."},
-            weeks={1: [
-                PlanItem(
-                    id=str(uuid.uuid4()),
-                    item_type="practice",
-                    description=desc,
-                    estimated_minutes=120,
-                    status="todo",
-                    minutes_spent=0,
-                    resources=[
-                        Resource(
-                            title=f"Hands-on {skill} Tutorial",
-                            url="https://www.youtube.com/results?search_query=" + skill.replace(" ", "+"),
-                            type=ResourceType.VIDEO,
-                            level="beginner",
-                            time_estimate_minutes=60
-                        )
-                    ]
-                )
-            ]}
+            goal_sentences={1: goal},
+            weeks={1: items}
         )
 
 def replan(state: LearnerState) -> WeeklyPlan:
