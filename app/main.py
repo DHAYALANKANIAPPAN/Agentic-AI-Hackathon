@@ -2370,14 +2370,14 @@ async def roles_page(request: Request):
     for role in roles:
         roles_html += f'''
         <div class="flex items-center justify-between p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-800 transition-colors">
-            <div class="flex flex-col">
-                <h3 class="text-lg font-bold text-white">{role['target_role']}</h3>
+            <a href="/dashboard/{role['learner_id']}" class="flex flex-col flex-1 cursor-pointer group">
+                <h3 class="text-lg font-bold text-white group-hover:text-purple-400 transition-colors">{role['target_role']}</h3>
                 <p class="text-xs text-slate-400 mt-1 flex items-center gap-1">
                     <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     Initial Document Uploaded
                 </p>
-            </div>
-            <a href="/role/{role['learner_id']}" class="px-4 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-md transition-all">Inspect Documents</a>
+            </a>
+            <a href="/role/{role['learner_id']}" class="px-4 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-md transition-all ml-4">Inspect Documents</a>
         </div>
         '''
         
@@ -2409,7 +2409,7 @@ async def roles_page(request: Request):
             </div>
             
             <a href="/onboard" class="w-full block text-center py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold rounded-lg shadow-lg transition-all">
-                + Upload New Document
+                + Add Role
             </a>
         </div>
     
