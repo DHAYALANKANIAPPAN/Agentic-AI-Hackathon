@@ -239,30 +239,39 @@ def answer_question(state: LearnerState, chat_history: List[Dict[str, str]], que
         logging.getLogger(__name__).warning(f"Failed to answer question: {e}")
         return "I'm sorry, I'm having trouble connecting to my knowledge base right now. Please try asking again later!"
 
-def write_report_narrative(stats: ProgressStats, state: LearnerState) -> str:
+def write_report_narrative(stats: ProgressStats, state: LearnerState, username: str = 'Student') -> str:
     """Writes an encouraging progress report narrative."""
-    cache_key = str(stats.items_done) + str(stats.hours_spent) + (state.gaps.target_role if state.gaps else '')
+    cache_key = str(stats.items_done) + str(stats.hours_spent) + (state.gaps.target_role if state.gaps else '') + username
     if cache_key in _cache_report: return _cache_report[cache_key]
     
     skills_acq = stats.skills_by_status.get('has', 0)
     
     struggles_str = ", ".join([s.topic_id for s in state.struggle_flags]) if state.struggle_flags else "None"
     
+    import datetime
+    current_date = datetime.datetime.now().strftime("%B %d, %Y")
     prompt = f"""
-    Write a short, encouraging progress report for a student aiming to be a "{state.gaps.target_role if state.gaps else 'Unknown'}".
+    Write a short, encouraging progress report for a student named {username} aiming to be a "{state.gaps.target_role if state.gaps else 'Unknown'}".
+    Date: {current_date}
     - Hours studied: {stats.hours_spent}
     - Items completed: {stats.items_done}
     - Skills acquired: {skills_acq}
     - Struggling areas: {struggles_str}
     
     The report MUST cover:
-    1. Skills acquired and skills in progress.
-    2. Remaining gaps and struggling areas.
-    3. End with exactly 3 to 5 concrete next steps tied to their learning plan.
+    1. A personalized greeting using the student's name ({username}) and the current date ({current_date}). Do not use placeholders like [Insert Name].
+    2. Skills acquired and skills in progress.
+    3. Remaining gaps and struggling areas.
+    4. End with exactly 3 to 5 concrete next steps tied to their learning plan.
+    
+    CRITICAL INSTRUCTION: Do NOT use markdown symbols like ** or *. If you want to make text bold, use HTML <strong> tags.
     """
     
     try:
         report = llm.generate_text(prompt)
+        if "**" in report:
+            parts = report.split("**")
+            report = "".join(f"<strong>{p}</strong>" if i % 2 == 1 else p for i, p in enumerate(parts))
         _cache_report[cache_key] = report
         return report
     except Exception as e:

@@ -650,7 +650,22 @@ def generate_progress_report(
     remaining_items = total_items - completed_items
     completion_pct = round((completed_items / total_items * 100), 1) if total_items > 0 else 0.0
 
-    narrative = write_report_narrative(stats, learner)
+    
+    # Fetch username from DB to pass to narrative
+    username = "Student"
+    import sqlite3
+    from app.repository import get_db
+    try:
+        with get_db(db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT username FROM user_roles WHERE learner_id = ?", (learner_id,))
+            row = cursor.fetchone()
+            if row:
+                username = row["username"]
+    except Exception:
+        pass
+
+    narrative = write_report_narrative(stats, learner, username=username)
 
     acquired_skills = []
     in_progress_skills = []
