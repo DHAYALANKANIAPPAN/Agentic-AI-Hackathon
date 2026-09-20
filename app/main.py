@@ -47,7 +47,40 @@ async def global_exception_handler(request: Request, exc: Exception):
     <body>
         <h2>Internal Server Error</h2>
         <pre>{error_trace}</pre>
-    </body>
+    
+    <!-- Quiz Modal -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-950/80 backdrop-blur-sm px-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+            <div class="p-6 border-b border-slate-800">
+                <h3 class="text-xl font-bold text-white">Skill Verification Quiz</h3>
+                <p class="text-sm text-slate-400 mt-1">Answer these questions to log your progress.</p>
+            </div>
+            <form action="/quiz/{learner_id}/submit" method="POST" class="p-6 space-y-5">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">1. What is the primary purpose of version control (like Git)?</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="A" required> A) To compile code faster</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="B"> B) To track changes and collaborate</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="C"> C) To style HTML pages</label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">2. Which data structure uses LIFO (Last In First Out)?</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="A" required> A) Queue</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="B"> B) Array</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="C"> C) Stack</label>
+                    </div>
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="document.getElementById('quiz-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-all">Cancel</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all">Submit Answers</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
     </html>
     '''
     return HTMLResponse(content=html_content, status_code=500)
@@ -151,6 +184,39 @@ async def root():
         }});
     }});
 </script>
+
+    <!-- Quiz Modal -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-950/80 backdrop-blur-sm px-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+            <div class="p-6 border-b border-slate-800">
+                <h3 class="text-xl font-bold text-white">Skill Verification Quiz</h3>
+                <p class="text-sm text-slate-400 mt-1">Answer these questions to log your progress.</p>
+            </div>
+            <form action="/quiz/{learner_id}/submit" method="POST" class="p-6 space-y-5">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">1. What is the primary purpose of version control (like Git)?</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="A" required> A) To compile code faster</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="B"> B) To track changes and collaborate</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="C"> C) To style HTML pages</label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">2. Which data structure uses LIFO (Last In First Out)?</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="A" required> A) Queue</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="B"> B) Array</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="C"> C) Stack</label>
+                    </div>
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="document.getElementById('quiz-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-all">Cancel</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all">Submit Answers</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </body>
 
     </html>
@@ -373,6 +439,39 @@ async def onboard_form():
         }});
     }});
 </script>
+
+    <!-- Quiz Modal -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-950/80 backdrop-blur-sm px-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+            <div class="p-6 border-b border-slate-800">
+                <h3 class="text-xl font-bold text-white">Skill Verification Quiz</h3>
+                <p class="text-sm text-slate-400 mt-1">Answer these questions to log your progress.</p>
+            </div>
+            <form action="/quiz/{learner_id}/submit" method="POST" class="p-6 space-y-5">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">1. What is the primary purpose of version control (like Git)?</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="A" required> A) To compile code faster</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="B"> B) To track changes and collaborate</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="C"> C) To style HTML pages</label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">2. Which data structure uses LIFO (Last In First Out)?</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="A" required> A) Queue</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="B"> B) Array</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="C"> C) Stack</label>
+                    </div>
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="document.getElementById('quiz-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-all">Cancel</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all">Submit Answers</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </body>
 
     </html>
@@ -661,6 +760,39 @@ async def view_gaps(learner_id: str):
         }});
     }});
 </script>
+
+    <!-- Quiz Modal -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-950/80 backdrop-blur-sm px-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+            <div class="p-6 border-b border-slate-800">
+                <h3 class="text-xl font-bold text-white">Skill Verification Quiz</h3>
+                <p class="text-sm text-slate-400 mt-1">Answer these questions to log your progress.</p>
+            </div>
+            <form action="/quiz/{learner_id}/submit" method="POST" class="p-6 space-y-5">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">1. What is the primary purpose of version control (like Git)?</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="A" required> A) To compile code faster</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="B"> B) To track changes and collaborate</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="C"> C) To style HTML pages</label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">2. Which data structure uses LIFO (Last In First Out)?</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="A" required> A) Queue</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="B"> B) Array</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="C"> C) Stack</label>
+                    </div>
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="document.getElementById('quiz-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-all">Cancel</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all">Submit Answers</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </body>
 
     </html>
@@ -1012,6 +1144,39 @@ async def view_weekly_plan(learner_id: str, week: int = 1, replanned: Optional[i
         }});
     }});
 </script>
+
+    <!-- Quiz Modal -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-950/80 backdrop-blur-sm px-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+            <div class="p-6 border-b border-slate-800">
+                <h3 class="text-xl font-bold text-white">Skill Verification Quiz</h3>
+                <p class="text-sm text-slate-400 mt-1">Answer these questions to log your progress.</p>
+            </div>
+            <form action="/quiz/{learner_id}/submit" method="POST" class="p-6 space-y-5">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">1. What is the primary purpose of version control (like Git)?</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="A" required> A) To compile code faster</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="B"> B) To track changes and collaborate</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="C"> C) To style HTML pages</label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">2. Which data structure uses LIFO (Last In First Out)?</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="A" required> A) Queue</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="B"> B) Array</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="C"> C) Stack</label>
+                    </div>
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="document.getElementById('quiz-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-all">Cancel</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all">Submit Answers</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </body>
 
     </html>
@@ -1261,6 +1426,39 @@ async def view_dashboard(learner_id: str):
         }});
     }});
 </script>
+
+    <!-- Quiz Modal -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-950/80 backdrop-blur-sm px-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+            <div class="p-6 border-b border-slate-800">
+                <h3 class="text-xl font-bold text-white">Skill Verification Quiz</h3>
+                <p class="text-sm text-slate-400 mt-1">Answer these questions to log your progress.</p>
+            </div>
+            <form action="/quiz/{learner_id}/submit" method="POST" class="p-6 space-y-5">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">1. What is the primary purpose of version control (like Git)?</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="A" required> A) To compile code faster</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="B"> B) To track changes and collaborate</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="C"> C) To style HTML pages</label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">2. Which data structure uses LIFO (Last In First Out)?</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="A" required> A) Queue</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="B"> B) Array</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="C"> C) Stack</label>
+                    </div>
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="document.getElementById('quiz-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-all">Cancel</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all">Submit Answers</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </body>
 
     </html>
@@ -1574,6 +1772,39 @@ async def view_chat(learner_id: str):
         }});
     }});
 </script>
+
+    <!-- Quiz Modal -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-950/80 backdrop-blur-sm px-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+            <div class="p-6 border-b border-slate-800">
+                <h3 class="text-xl font-bold text-white">Skill Verification Quiz</h3>
+                <p class="text-sm text-slate-400 mt-1">Answer these questions to log your progress.</p>
+            </div>
+            <form action="/quiz/{learner_id}/submit" method="POST" class="p-6 space-y-5">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">1. What is the primary purpose of version control (like Git)?</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="A" required> A) To compile code faster</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="B"> B) To track changes and collaborate</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="C"> C) To style HTML pages</label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">2. Which data structure uses LIFO (Last In First Out)?</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="A" required> A) Queue</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="B"> B) Array</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="C"> C) Stack</label>
+                    </div>
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="document.getElementById('quiz-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-all">Cancel</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all">Submit Answers</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </body>
 
     </html>
@@ -2195,6 +2426,39 @@ async def view_progress_report(learner_id: str):
         }});
     }});
 </script>
+
+    <!-- Quiz Modal -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-950/80 backdrop-blur-sm px-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+            <div class="p-6 border-b border-slate-800">
+                <h3 class="text-xl font-bold text-white">Skill Verification Quiz</h3>
+                <p class="text-sm text-slate-400 mt-1">Answer these questions to log your progress.</p>
+            </div>
+            <form action="/quiz/{learner_id}/submit" method="POST" class="p-6 space-y-5">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">1. What is the primary purpose of version control (like Git)?</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="A" required> A) To compile code faster</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="B"> B) To track changes and collaborate</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="C"> C) To style HTML pages</label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">2. Which data structure uses LIFO (Last In First Out)?</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="A" required> A) Queue</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="B"> B) Array</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="C"> C) Stack</label>
+                    </div>
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="document.getElementById('quiz-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-all">Cancel</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all">Submit Answers</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </body>
 
     </html>
@@ -2331,6 +2595,39 @@ async def login_page():
         }});
     }});
 </script>
+
+    <!-- Quiz Modal -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-950/80 backdrop-blur-sm px-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+            <div class="p-6 border-b border-slate-800">
+                <h3 class="text-xl font-bold text-white">Skill Verification Quiz</h3>
+                <p class="text-sm text-slate-400 mt-1">Answer these questions to log your progress.</p>
+            </div>
+            <form action="/quiz/{learner_id}/submit" method="POST" class="p-6 space-y-5">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">1. What is the primary purpose of version control (like Git)?</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="A" required> A) To compile code faster</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="B"> B) To track changes and collaborate</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="C"> C) To style HTML pages</label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">2. Which data structure uses LIFO (Last In First Out)?</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="A" required> A) Queue</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="B"> B) Array</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="C"> C) Stack</label>
+                    </div>
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="document.getElementById('quiz-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-all">Cancel</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all">Submit Answers</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </body>
 
     </html>
@@ -2464,6 +2761,39 @@ async def roles_page(request: Request):
         }});
     }});
 </script>
+
+    <!-- Quiz Modal -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-950/80 backdrop-blur-sm px-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+            <div class="p-6 border-b border-slate-800">
+                <h3 class="text-xl font-bold text-white">Skill Verification Quiz</h3>
+                <p class="text-sm text-slate-400 mt-1">Answer these questions to log your progress.</p>
+            </div>
+            <form action="/quiz/{learner_id}/submit" method="POST" class="p-6 space-y-5">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">1. What is the primary purpose of version control (like Git)?</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="A" required> A) To compile code faster</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="B"> B) To track changes and collaborate</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="C"> C) To style HTML pages</label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">2. Which data structure uses LIFO (Last In First Out)?</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="A" required> A) Queue</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="B"> B) Array</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="C"> C) Stack</label>
+                    </div>
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="document.getElementById('quiz-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-all">Cancel</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all">Submit Answers</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </body>
 
     </html>
@@ -2516,7 +2846,40 @@ async def profile_page(request: Request):
                 <a href="/roles" class="w-full block py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-all">View Roles & Documents</a>
             </div>
         </main>
-    </body>
+    
+    <!-- Quiz Modal -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-950/80 backdrop-blur-sm px-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+            <div class="p-6 border-b border-slate-800">
+                <h3 class="text-xl font-bold text-white">Skill Verification Quiz</h3>
+                <p class="text-sm text-slate-400 mt-1">Answer these questions to log your progress.</p>
+            </div>
+            <form action="/quiz/{learner_id}/submit" method="POST" class="p-6 space-y-5">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">1. What is the primary purpose of version control (like Git)?</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="A" required> A) To compile code faster</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="B"> B) To track changes and collaborate</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="C"> C) To style HTML pages</label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">2. Which data structure uses LIFO (Last In First Out)?</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="A" required> A) Queue</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="B"> B) Array</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="C"> C) Stack</label>
+                    </div>
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="document.getElementById('quiz-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-all">Cancel</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all">Submit Answers</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
     </html>
     '''
     return HTMLResponse(content=html_content)
@@ -2606,17 +2969,101 @@ async def inspect_role_page(learner_id: str, request: Request):
             <h2 class="text-2xl font-bold text-white mb-2">Documents for {role_name}</h2>
             <p class="text-slate-400 mb-8">Manage the files and certificates uploaded for this role.</p>
             
-            <div class="mb-8">
+            <div id="doc-list" class="mb-8">
                 {docs_html}
             </div>
             
-            <form action="/role/{learner_id}/upload" method="POST" enctype="multipart/form-data" onsubmit="showUploadLoading()" class="p-6 rounded-xl border border-dashed border-slate-600 bg-slate-900/50">
+            <form id="uploadForm" class="p-6 rounded-xl border border-dashed border-slate-600 bg-slate-900/50">
                 <h3 class="text-lg font-bold text-white mb-4">Upload Another Document</h3>
-                <input type="file" name="file" required class="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-900/40 file:text-purple-300 hover:file:bg-purple-900/60 transition-all mb-4">
+                <input type="file" id="fileInput" name="file" required class="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-900/40 file:text-purple-300 hover:file:bg-purple-900/60 transition-all mb-4">
                 <button type="submit" id="upload-btn" class="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl transition-all">Upload Document</button>
             </form>
+            
+            <script>
+            document.getElementById('uploadForm').addEventListener('submit', async function(e) {{
+                e.preventDefault();
+                const btn = document.getElementById('upload-btn');
+                const fileInput = document.getElementById('fileInput');
+                const file = fileInput.files[0];
+                if (!file) return;
+                
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Uploading...';
+                btn.classList.add('opacity-75', 'cursor-not-allowed');
+                btn.disabled = true;
+                
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                try {{
+                    await fetch('/role/{learner_id}/upload', {{
+                        method: 'POST',
+                        body: formData
+                    }});
+                    
+                    alert("Document Uploaded Successfully!");
+                    
+                    const list = document.getElementById('doc-list');
+                    const newDoc = document.createElement('div');
+                    newDoc.className = 'flex items-center justify-between p-4 rounded-xl border border-slate-700 bg-slate-800/50 mt-4';
+                    newDoc.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-indigo-500/20 rounded-lg text-indigo-400">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-white">${file.name}</h3>
+                            <p class="text-xs text-emerald-400 flex items-center gap-1 mt-0.5"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Processed</p>
+                        </div>
+                    </div>
+                    <span class="text-xs text-slate-500">Just now</span>`;
+                    list.appendChild(newDoc);
+                    
+                }} catch(err) {{
+                    alert("Error uploading document!");
+                }} finally {{
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                    btn.disabled = false;
+                    document.getElementById('uploadForm').reset();
+                }}
+            }});
+            </script>
         </main>
-    </body>
+    
+    <!-- Quiz Modal -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-950/80 backdrop-blur-sm px-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+            <div class="p-6 border-b border-slate-800">
+                <h3 class="text-xl font-bold text-white">Skill Verification Quiz</h3>
+                <p class="text-sm text-slate-400 mt-1">Answer these questions to log your progress.</p>
+            </div>
+            <form action="/quiz/{learner_id}/submit" method="POST" class="p-6 space-y-5">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">1. What is the primary purpose of version control (like Git)?</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="A" required> A) To compile code faster</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="B"> B) To track changes and collaborate</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q1" value="C"> C) To style HTML pages</label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">2. Which data structure uses LIFO (Last In First Out)?</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="A" required> A) Queue</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="B"> B) Array</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-400"><input type="radio" name="q2" value="C"> C) Stack</label>
+                    </div>
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="document.getElementById('quiz-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-all">Cancel</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all">Submit Answers</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
     </html>
     '''
     return HTMLResponse(content=html_content)
@@ -2625,19 +3072,17 @@ async def inspect_role_page(learner_id: str, request: Request):
 async def handle_role_upload(learner_id: str, file: UploadFile = File(...)):
     import asyncio
     await asyncio.sleep(0.5)
-    from app.repository import get_learner, save_learner
+    from app.repository import log_activity
     from shared.schemas.models import ActivityLog
     import datetime
-    learner = get_learner(learner_id)
-    if learner and file.filename:
-        learner.activity_log.append(ActivityLog(
+    if file.filename:
+        log_activity(learner_id, ActivityLog(
             item_id=f"doc_{file.filename}", 
             minutes_spent=0, 
             rating="ok", 
             timestamp=datetime.datetime.now()
         ))
-        save_learner(learner)
-    return RedirectResponse(url=f"/role/{learner_id}", status_code=status.HTTP_303_SEE_OTHER)
+    return {"status": "success"}
 
 
 @app.get("/role/{learner_id}/delete")
@@ -2648,3 +3093,27 @@ async def delete_role_endpoint(learner_id: str, request: Request):
     from app.auth import delete_user_role
     delete_user_role(username, learner_id)
     return RedirectResponse(url="/roles")
+
+@app.post("/quiz/{learner_id}/submit")
+async def submit_quiz(learner_id: str, request: Request):
+    form_data = await request.form()
+    q1 = form_data.get("q1")
+    q2 = form_data.get("q2")
+    
+    score = 0
+    if q1 == "B": score += 50
+    if q2 == "C": score += 50
+    
+    from app.repository import log_activity
+    from shared.schemas.models import ActivityLog
+    import datetime
+    
+    log_activity(learner_id, ActivityLog(
+        item_id="Skill Verification Quiz", 
+        minutes_spent=15, 
+        rating="ok", 
+        quiz_score=float(score),
+        timestamp=datetime.datetime.now()
+    ))
+    
+    return RedirectResponse(url=f"/dashboard/{learner_id}", status_code=status.HTTP_303_SEE_OTHER)
