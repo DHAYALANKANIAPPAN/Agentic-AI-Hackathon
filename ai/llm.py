@@ -17,14 +17,15 @@ import openai
 
 client = OpenAI(
   base_url = "https://integrate.api.nvidia.com/v1",
-  api_key = os.environ.get("NVIDIA_API_KEY", "missing_key")
+  api_key = os.environ.get("NVIDIA_API_KEY", "missing_key"),
+  timeout=5.0
 )
 
 def generate_text(prompt: str, model_name: str = "meta/llama-3.2-11b-vision-instruct") -> str:
     """Generates plain text output."""
     import time
     
-    max_retries = 3
+    max_retries = 1
     for attempt in range(max_retries):
         try:
             response = client.chat.completions.create(
@@ -53,7 +54,7 @@ def generate_json(prompt: str, response_schema: Type[T], model_name: str = "meta
         "Do not include any markdown formatting, backticks, or extra text. Just the JSON."
     )
     
-    max_retries = 3
+    max_retries = 1
     for attempt in range(max_retries):
         try:
             response = client.chat.completions.create(

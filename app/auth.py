@@ -60,3 +60,11 @@ def get_user_roles(username: str, db_path: str = DEFAULT_DB_PATH) -> List[Dict[s
         cursor = conn.cursor()
         cursor.execute("SELECT target_role, learner_id FROM user_roles WHERE username = ?", (username,))
         return [{"target_role": row["target_role"], "learner_id": row["learner_id"]} for row in cursor.fetchall()]
+
+def delete_user_role(username: str, learner_id: str, db_path: str = DEFAULT_DB_PATH):
+    init_users_db(db_path)
+    with get_db(db_path) as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM user_roles WHERE username = ? AND learner_id = ?", (username, learner_id))
+        conn.commit()
+

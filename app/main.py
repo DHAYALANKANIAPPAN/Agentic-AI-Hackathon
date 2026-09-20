@@ -2378,6 +2378,7 @@ async def roles_page(request: Request):
                 </p>
             </a>
             <a href="/role/{role['learner_id']}" class="px-4 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-md transition-all ml-4">Inspect Documents</a>
+<a href="/role/{role['learner_id']}/delete" onclick="return confirm('Are you sure you want to delete this role?');" class="px-4 py-2 text-xs font-bold text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-lg shadow-md transition-all ml-2">Delete</a>
         </div>
         '''
         
@@ -2510,6 +2511,38 @@ async def inspect_role_page(learner_id: str, request: Request):
         return RedirectResponse(url="/roles")
         
     role_name = learner.gaps.target_role if learner.gaps else "Unknown Role"
+
+    # Build documents list
+    docs_html = '''
+                <div class="flex items-center justify-between p-4 rounded-xl border border-slate-700 bg-slate-800/50">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-indigo-500/20 rounded-lg text-indigo-400">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-white">Initial_Resume.pdf</h3>
+                            <p class="text-xs text-emerald-400 flex items-center gap-1 mt-0.5"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Processed</p>
+                        </div>
+                    </div>
+                    <span class="text-xs text-slate-500">Just now</span>
+                </div>'''
+    
+    for act in learner.activity_log:
+        if act.item_id.startswith("doc_"):
+            filename = act.item_id[4:]
+            docs_html += f'''
+                <div class="flex items-center justify-between p-4 rounded-xl border border-slate-700 bg-slate-800/50 mt-4">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-indigo-500/20 rounded-lg text-indigo-400">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-white">{filename}</h3>
+                            <p class="text-xs text-emerald-400 flex items-center gap-1 mt-0.5"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Processed</p>
+                        </div>
+                    </div>
+                    <span class="text-xs text-slate-500">{act.timestamp.strftime('%b %d, %H:%M') if hasattr(act.timestamp, 'strftime') else str(act.timestamp)[:16]}</span>
+                </div>'''
     
     html_content = f'''
     <!DOCTYPE html>
@@ -2555,19 +2588,8 @@ async def inspect_role_page(learner_id: str, request: Request):
             <h2 class="text-2xl font-bold text-white mb-2">Documents for {role_name}</h2>
             <p class="text-slate-400 mb-8">Manage the files and certificates uploaded for this role.</p>
             
-            <div class="space-y-4 mb-8">
-                <div class="flex items-center justify-between p-4 rounded-xl border border-slate-700 bg-slate-800/50">
-                    <div class="flex items-center gap-3">
-                        <div class="p-2 bg-indigo-500/20 rounded-lg text-indigo-400">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-white">Initial_Resume.pdf</h3>
-                            <p class="text-xs text-emerald-400 flex items-center gap-1 mt-0.5"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Processed</p>
-                        </div>
-                    </div>
-                    <span class="text-xs text-slate-500">Just now</span>
-                </div>
+            <div class="mb-8">
+                {docs_html}
             </div>
             
             <form action="/role/{learner_id}/upload" method="POST" enctype="multipart/form-data" onsubmit="showUploadLoading()" class="p-6 rounded-xl border border-dashed border-slate-600 bg-slate-900/50">
@@ -2583,8 +2605,28 @@ async def inspect_role_page(learner_id: str, request: Request):
 
 @app.post("/role/{learner_id}/upload")
 async def handle_role_upload(learner_id: str, file: UploadFile = File(...)):
-    # Fake a short delay for UX
     import asyncio
-    await asyncio.sleep(1)
+    await asyncio.sleep(0.5)
+    from app.repository import get_learner, save_learner
+    from shared.schemas.models import ActivityLog
+    import datetime
+    learner = get_learner(learner_id)
+    if learner and file.filename:
+        learner.activity_log.append(ActivityLog(
+            item_id=f"doc_{file.filename}", 
+            minutes_spent=0, 
+            rating="DOCUMENT", 
+            timestamp=datetime.datetime.now()
+        ))
+        save_learner(learner)
     return RedirectResponse(url=f"/role/{learner_id}", status_code=status.HTTP_303_SEE_OTHER)
 
+
+@app.get("/role/{learner_id}/delete")
+async def delete_role_endpoint(learner_id: str, request: Request):
+    username = request.cookies.get("username")
+    if not username:
+        return RedirectResponse(url="/login")
+    from app.auth import delete_user_role
+    delete_user_role(username, learner_id)
+    return RedirectResponse(url="/roles")
